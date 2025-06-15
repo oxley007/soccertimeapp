@@ -21,6 +21,7 @@
     "@react-navigation/drawer": "^6.6.2",
     "@react-navigation/native": "^6.1.6",
     "@redux-devtools/extension": "^3.2.5",
+    "@sentry/react-native": "^6.15.1",
     "expo": "^49.0.3",
     "jetifier": "^2.0.0",
     "native-base": "^3.4.28",

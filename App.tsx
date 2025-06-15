@@ -103,6 +103,28 @@ import AddAiTeamPlayersPositionHome from './Components/AddAiPositions/AddAiTeamP
 
 
 //import MenuHidden from './MenuHidden';
+import * as Sentry from '@sentry/react-native';
+
+if (!__DEV__) {
+  Sentry.init({
+    dsn: 'https://your-dsn@sentry.io/project-id',
+    sendDefaultPii: true,
+    integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1,
+    // Don't enable debug in production
+  });
+} else {
+  Sentry.init({
+    dsn: 'https://your-dsn@sentry.io/project-id',
+    debug: true, // ✅ Logs to console while developing
+    sendDefaultPii: true,
+    integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1,
+  });
+}
+
 
 
 class Hidden extends React.Component {
@@ -125,7 +147,7 @@ const CustomDrawerComponent = (props) => (
 
 const Drawer = createDrawerNavigator();
 
-export default function App() {
+export default Sentry.wrap(function App() {
 
   useEffect(() => {
     const apiKey = Platform.OS === 'ios'
@@ -222,7 +244,7 @@ export default function App() {
       </Drawer.Navigator>
     </NavigationContainer>
   );
-}
+});
 
 /* to hide mmenu in grawer - add this to options:
 drawerItemStyle: {
