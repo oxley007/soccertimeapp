@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Component, useRef } from 'react'
-import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio, Platform } from 'react-native'
 import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, Icon, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, HStack, Select } from 'native-base';
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
@@ -27,6 +27,7 @@ const GameStats = (props)=>{
   let games = useSelector(state => state.games.games);
   let statsBoard = useSelector(state => state.statsBoard.statsBoard)
   let statsBoardPlayerId = useSelector(state => state.statsBoard.playerId)
+  let secondsElapsed = useSelector(state => state.stopwatch.secondsElapsed)
 
   const dispatch = useDispatch()
 
@@ -41,12 +42,22 @@ const GameStats = (props)=>{
 
   useEffect(() => {
 
-    //console.log(statsBoard + ' hit and check statsBoard');
+    console.log('hit each time update?');
+  //console.log(statsBoard + ' hit and check statsBoard');
     setStatsBoardDisplay(statsBoard)
     setStatsPlayerId(statsBoardPlayerId)
     //setGameOptionBoardDisplay(gameOptionBoard)
 
-  },[statsBoard, statsBoardPlayerId])
+    /*
+    console.log(props.statsPlayerId + ' check statsPlayerId here.');
+    console.log(statsBoardPlayerId + ' check statsBoardPlayerId here.');
+    if (statsBoardPlayerId === 99999999 || statsBoardPlayerId === undefined) {
+      console.log('hit?');
+      setStatsPlayerId(props.statsPlayerId)
+    }
+    */
+
+  },[statsBoard, statsBoardPlayerId, secondsElapsed])
 
 
   useEffect(() => {
@@ -59,16 +70,38 @@ const GameStats = (props)=>{
       _games = [{...games}]
     }
 
-    //console.log(statsBoardPlayerId + ' what is statsPlayerId, please?');
-    if (statsBoardPlayerId === 99999999 || statsBoardPlayerId === undefined) {
+  //console.log(statsBoardPlayerId + ' what is statsPlayerId, please?');
+
+
+
+    if ((statsBoardPlayerId === 99999999 || statsBoardPlayerId === undefined) && (props.statsPlayerId === 99999999 || props.statsPlayerId === undefined)) {
       setGolStat(95)
     }
+    else if (props.statsPlayerId !== 99999999 || props.statsPlayerId !== undefined) {
+
+
+      const playerIndex = _games[0].teamPlayers.findIndex(x => x.id === props.statsId);
+
+
+      console.log('im am hittin ghere.');
+      console.log(playerIndex + ' playerIndex index check.');
+      console.log(JSON.stringify(_games[0].teamPlayers) + ' _games[0].teamPlayers checking. here');
+
+      const golStat = _games[0].teamPlayers[playerIndex].gameStats[0].gol
+      setGolStat(golStat)
+      const asstStat = _games[0].teamPlayers[playerIndex].gameStats[0].asst
+      setAsstStat(asstStat)
+      const defTacStat = _games[0].teamPlayers[playerIndex].gameStats[0].defTac
+      setDefTacStat(defTacStat)
+      const golSaveStat = _games[0].teamPlayers[playerIndex].gameStats[0].golSave
+      setGolSaveStat(golSaveStat)
+    }
     else {
-      //console.log(JSON.stringify(_games[0].teamPlayers) + ' stats boar dchek games.teamPlayers');
+    //console.log(JSON.stringify(_games[0].teamPlayers) + ' stats boar dchek games.teamPlayers');
       const playerIndex = _games[0].teamPlayers.findIndex(x => x.id === statsBoardPlayerId);
-      //console.log(playerIndex + ' and what is player index? ');
-      //console.log(JSON.stringify(_games[0].teamPlayers[playerIndex]) + ' _games[0].teamPlayers[playerIndex] stats boar dchek games.teamPlayers');
-      //console.log(_games[0].teamPlayers[playerIndex].gameStats[0].gol + ' just checking oout _games[0].teamPlayers[playerIndex].gameStats[0].gol.');
+    //console.log(playerIndex + ' and what is player index? ');
+    //console.log(JSON.stringify(_games[0].teamPlayers[playerIndex]) + ' _games[0].teamPlayers[playerIndex] stats boar dchek games.teamPlayers');
+    //console.log(_games[0].teamPlayers[playerIndex].gameStats[0].gol + ' just checking oout _games[0].teamPlayers[playerIndex].gameStats[0].gol.');
       const golStat = _games[0].teamPlayers[playerIndex].gameStats[0].gol
       setGolStat(golStat)
       const asstStat = _games[0].teamPlayers[playerIndex].gameStats[0].asst
@@ -80,7 +113,7 @@ const GameStats = (props)=>{
 
     }
 
-  },[statsBoard, statsBoardPlayerId])
+  },[statsBoard, statsBoardPlayerId, secondsElapsed])
 
         return (
           <View>

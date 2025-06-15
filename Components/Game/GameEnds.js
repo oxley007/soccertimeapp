@@ -5,8 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/AntDesign';
-const plusIcon = <Icon name="plus" size={30} color="#0891b2" />;
-const minusIcon = <Icon name="minus" size={30} color="#0891b2" />;
+const plusIcon = <Icon name="plus" size={30} color="#E879F9" />;
+const minusIcon = <Icon name="minus" size={30} color="#E879F9" />;
 import LinearGradient from 'react-native-linear-gradient';
 
 import { updateGames } from '../../Reducers/games';
@@ -16,6 +16,7 @@ import KickOff from './KickOff.js';
 import Stopwatch from './Stopwatch.js';
 import SelectPlayerList from '../AddPlayers/SelectPlayerList.js'
 import GameEventsHtFt from './GameEventsHtFt.js'
+import SeasonPositionSortAll from '../PlayerStats/SeasonPositionSortAll.js'
 
 const GameEnds = (props)=>{
 
@@ -43,17 +44,20 @@ const GameEnds = (props)=>{
 
   const saveGame = () => {
 
+    /*
+    const teamIdCode = games[0].teamIdCode
+
     teamPlayers.map(player => {
 
       if (player.teamId === games[0].teamId) {
         const playerIndex = games[0].teamPlayers.findIndex(x => x.id === player.id);
-        //console.log(JSON.stringify(player.stats) + ' check player sats here.');
-        //console.log(JSON.stringify(player) + ' check player here.');
+      //console.log(JSON.stringify(player.stats) + ' check player sats here.');
+      //console.log(JSON.stringify(player) + ' check player here.');
 
-        //console.log(JSON.stringify(games[0].teamPlayers) + ' wtf 2 game stats for player here.');
-        //console.log(JSON.stringify(games[0].teamPlayers[playerIndex]) + ' wtf game stats for player here.');
-        //console.log(JSON.stringify(games[0].teamPlayers[playerIndex].gameStats) + ' game stats for player here.');
-        //console.log(JSON.stringify(games[0].teamPlayers[playerIndex].gameStats[0]) + ' game stats[0] for player here.');
+      //console.log(JSON.stringify(games[0].teamPlayers) + ' wtf 2 game stats for player here.');
+      //console.log(JSON.stringify(games[0].teamPlayers[playerIndex]) + ' wtf game stats for player here.');
+      //console.log(JSON.stringify(games[0].teamPlayers[playerIndex].gameStats) + ' game stats for player here.');
+      //console.log(JSON.stringify(games[0].teamPlayers[playerIndex].gameStats[0]) + ' game stats[0] for player here.');
 
         let currentSeason = ''
         if (games[0].season.id === undefined || games[0].season.id === 99999998 || games[0].season.id < 1) {
@@ -94,7 +98,31 @@ const GameEnds = (props)=>{
           player.postionTimeStats.push({gameId: games[0].id, season: currentSeason, posTimes: postionTimes})
         }
         }
+
+        const postionTimeStatsRaw = player.postionTimeStats
+        const statsRaw = player.stats
+        const playerId = player.playerId
+
+        //need to get teamId and player Id.
+
+     //console.log(teamIdCode + ' waht is teamIdCode?');
+     //console.log(playerId + ' waht is playerId?');
+     //console.log(JSON.stringify(postionTimeStatsRaw) + ' postionTimeStatsRaw plz');
+     //console.log(JSON.stringify(statsRaw) + ' statsRaw plz');
+
+        firestore().collection(teamIdCode).doc(playerId).update({
+           postionTimeStats: postionTimeStatsRaw,
+           stats: statsRaw
+         })
+
+         userRef.doc(playerId).update({
+           postionTimeStats: postionTimeStatsRaw,
+           stats: statsRaw
+           })
+           .catch(error => this.setState({ errorMessage: error.message }))
+
       }
+
     })
 
     dispatch(updateTeamPlayers(teamPlayers))
@@ -102,7 +130,50 @@ const GameEnds = (props)=>{
     games[0].halfTime = 5
     dispatch(updateGames(games))
 
-    navigate('Home');
+    const teamIdCodeGames = games[0].teamIdCode
+    const gameIdDb = games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: games[0],
+     })
+
+     userRef.doc(gameIdDb).update({
+         game: games[0],
+       })
+       .catch(error => this.setState({ errorMessage: error.message }))
+       */
+
+
+
+      const gameId = games[0].gameId
+
+      /*const saveOption = props.route.params.saveOption
+
+      if (saveOption === 1) {*/
+        navigate('Home',{
+          updateHome: gameId
+        });
+      /*}
+      else {
+
+        //const teamIdCodeGames = games[0].teamIdCode
+        const gameIdDb = games[0].gameIdDb
+
+        games.shift();
+
+        dispatch(updateGames(games))
+
+
+
+        userRef.doc(gameIdDb).update({
+            game: games[0],
+          })
+          .catch(error => console.log(error.message))
+
+        navigate('Home',{
+          updateHome: gameId
+        });
+      }*/
 
   }
 
@@ -116,12 +187,28 @@ const GameEnds = (props)=>{
     setIsGoalOpen(isGoalOpen)
   }
 
+  const displaySeasonPositionSortAll = () => {
 
-  //const teamType = props.route.params.teamType
+      try {
+      return (
+        <Box ml="5" mr="5" maxW="100%">
+          <SeasonPositionSortAll playerData={undefined} teamId={games[0].teamId} seasonId={seasonsDisplayId} whereFrom={79} navigation={props.navigation} displayTypeSort={true} liveGame={true} endGame={true} />
+        </Box>
+      )
+      }
+      catch {
+        //nothing.
+      }
+  }
+
+
+
+  //const teamType = props.route.params.teamTypesaveOption
 
         return (
           <Center>
-          <Box bg="#a855f7" style={{position:'absolute', top: 225, right: 0, height: 'auto',  width: 30, zIndex: 2, elevation: 2, borderBottomLeftRadius: 5, borderTopLeftRadius: 5}}>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradientBg}>
+          <Box bg="#E879F9" style={{position:'absolute', top: 225, right: 0, height: 'auto',  width: 30, zIndex: 2, elevation: 2, borderBottomLeftRadius: 5, borderTopLeftRadius: 5}}>
             <Button pt="2" pb="2" p="0" m="0" variant="unstyled" onPress={() => goToEvents()}>
               <Center>
                 <HStack>
@@ -145,10 +232,10 @@ const GameEnds = (props)=>{
               </Center>
             </Button>
           </Box>
-            <Container h="100%" w="100%" maxWidth="100%" pl="5" pr="5">
+            <Container h="100%" w="100%" maxWidth="100%">
               <Box mt="1">
-                <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
-                  <Heading mb="2" mt="2" style={{color: '#fff'}}>Fulltime Overview & Save</Heading>
+                <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
+                  <Heading mb="2" mt="2" style={{color: '#fff'}}>Fulltime Overview & Stats</Heading>
                   </LinearGradient>
                   <HStack>
                     {isGoalOpen === false &&
@@ -156,7 +243,7 @@ const GameEnds = (props)=>{
                         <HStack>
                           {isGoalOpen ? minusIcon : plusIcon}
                           <Center pl="2">
-                            <Text style={{color: '#0891b2', fontSize: 20}}>SHOW GOALS</Text>
+                            <Text style={{color: '#fff', fontSize: 20}}>SHOW GOALS SCORED</Text>
                           </Center>
                         </HStack>
                       </Button>
@@ -167,7 +254,7 @@ const GameEnds = (props)=>{
                       <HStack>
                         {isGoalOpen ? minusIcon : plusIcon}
                         <Center pl="2">
-                          <Text style={{color: '#0891b2', fontSize: 20}}>HIDE GOALS</Text>
+                          <Text style={{color: '#fff', fontSize: 20}}>HIDE GOALS SCORED</Text>
                         </Center>
                       </HStack>
                       </Button>
@@ -180,14 +267,21 @@ const GameEnds = (props)=>{
                     }
                   </HStack>
               </Box>
-              <SelectPlayerList whereFrom={'endGame'} navigation={props.navigation}/>
+              <ScrollView>
+              {displaySeasonPositionSortAll()}
+              </ScrollView>
               <Box minW="100%" safeAreaTop alignSelf="center" style={{paddingTop: 0}}>
-              <HStack alignItems="center" safeAreaBottom p="0" pt="7"  pb="7" shadow={6} >
-          <Button minW="100%" bg="tertiary.400" size="md" _text={{fontSize: "xl"}} variant="subtle" onPress={() => saveGame()}>Save Game Data</Button>
+              <HStack alignItems="center" safeAreaBottom p="0" pt="2"  pb="1" shadow={6} >
+          <Button minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl"}} variant="subtle" onPress={() => saveGame()}>
+          <Center>
+          <Text style={{color: '#fff', fontSize: 20, fontWeight: '500'}}>Return to Home</Text>
+          <Text style={{color: '#333', fontSize: 10}}>(You can revisit all stats from the stats pages)</Text>
+          </Center>
+          </Button>
                 </HStack>
         </Box>
             </Container>
-
+            </LinearGradient>
           </Center>
         )
     }
@@ -206,7 +300,12 @@ const styles = StyleSheet.create({
     minWidth: '100%',
     marginTop: 5,
     marginBottom: 5,
+    borderColor: '#fff',
+    borderWidth: 1,
   },
+  linearGradientBg: {
+    minWidth: '100%',
+  }
 })
 
 export default GameEnds;

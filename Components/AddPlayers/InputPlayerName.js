@@ -8,6 +8,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import { updateGames } from '../../Reducers/games';
 import { updateTeamPlayers } from '../../Reducers/teamPlayers';
+import { updateDragDropDisplayCount } from '../../Reducers/dragDropDisplayCount';
 
 const InputPlayerName = (props)=>{
 
@@ -17,6 +18,7 @@ const InputPlayerName = (props)=>{
   let teamPlayers = useSelector(state => state.teamPlayers.teamPlayers);
   let games = useSelector(state => state.games.games);
   let seasonsDisplay = useSelector(state => state.seasons.seasonsDisplay);
+  let dragDropDisplayCount = useSelector(state => state.dragDropDisplayCount.dragDropDisplayCount);
 
   const dispatch = useDispatch()
 
@@ -45,7 +47,7 @@ const InputPlayerName = (props)=>{
 
       return (
         <Box mt="3">
-          <Button size="md" minW="100%" variant="subtle" bg="tertiary.100" onPress={() => addPlayerButton()}>Add Player</Button>
+          <Button size="md" minW="100%" variant="subtle" bg="#E879F9" _text={{color: '#fff', fontSize: 16}} onPress={() => addPlayerButton()}>Add Player</Button>
         </Box>
       )
   }
@@ -100,8 +102,9 @@ const InputPlayerName = (props)=>{
     //console.log(JSON.stringify(teamPlayersArray) + ' need to check teamPlayersArray');
 
     inputs.map(input => {
+      //console.log(input.value + ' need to check input.value');
       if (input.value === '') {
-        //console.log('value is null');
+        //console.log('value is null.');
       }
       else {
         //console.log(input.value + ' what is here ok input.value');
@@ -141,29 +144,163 @@ const InputPlayerName = (props)=>{
 
         teamPlayersLength++
         //teamPlayersArray.push({id: teamPlayersLength, teamId: teamId, teamName: input.value, teamType: teamType, teamSelected: false});
-        teamPlayersArray.push({id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}});
-        games[0].teamPlayers.push({id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, currentPosition: 'NA', gameStats: {}, postionTimes: {fwd: {}, mid: {}, def: {}, gol: {}, sub: {}}, season: currentSeason});
+        //was this: teamPlayersArray.push({id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true});
+        //try {
+        //was this: games[0].teamPlayers.push({id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, currentPosition: 'sub', gameStats: {}, postionTimes: {fwd: {}, mid: {}, def: {}, gol: {}, sub: {}}, season: currentSeason, positionDetails: { row: 0, column: 0, indexId: 0, initials: '', gameTimeStats: '' }});
+        //}
+        //catch {
+        //  games[0].teamPlayers = []
+        //  games[0].teamPlayers.push({id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, currentPosition: 'abs', gameStats: {}, postionTimes: {fwd: {}, mid: {}, def: {}, gol: {}, sub: {}}, season: currentSeason, positionDetails: { row: 0, column: 0, indexId: 0, initials: '', gameTimeStats: '' }});
+        //}
+
+        const playerPositions = {
+          fwd: true,
+          mid: true,
+          def: true,
+          gol: true
+        }
+
+        const newPlayer = {
+          id: teamPlayersLength,
+          playerId: playerId,
+          teamId: teamId,
+          teamIdCode: teamIdCode,
+          playerName: input.value,
+          playerPositions: playerPositions
+        };
+
+
+        // Add to teamPlayersArray
+        teamPlayersArray.push({
+          ...newPlayer,
+          stats: {},
+          postionTimeStats: {},
+          inviteStatus: 0,
+          isPlayer: true,
+        });
+
+        // Add to games[0].teamPlayers
+        games[0].teamPlayers.push({
+          ...newPlayer,
+          currentPosition: 'sub',
+          gameStats: {},
+          postionTimes: {
+            fwd: {},
+            mid: {},
+            def: {},
+            gol: {},
+            sub: {},
+          },
+          season: currentSeason,
+          positionDetails: {
+            row: 0,
+            column: 0,
+            indexId: 0,
+            initials: '',
+            gameTimeStats: '',
+          },
+        });
+
+
 
         //console.log(teamPlayersArray + ' teamPlayersArray end.');
 
         _teamPlayers = teamPlayersArray;
 
-        dispatch(updateTeamPlayers(_teamPlayers))
+
         dispatch(updateGames(games))
 
-        ////console.log(JSON.stringify(userRef) + ' check userRef');
+        const teamIdCodeGames = games[0].teamIdCode
+        const gameIdDb = games[0].gameIdDb
+
+       //console.log(teamIdCodeGames + ' teamIdCodeGames');
+       //console.log(gameIdDb + ' gameIdDb 2');
+       //console.log(JSON.stringify(games[0]) + ' check games[0] here.');
+
+        try {
+        firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+           game: games[0],
+         })
+         .catch(error => {
+          //console.log('into error');
+          //console.log(error.message + ' this is the error');
+           this.setState({ errorMessage: error.message })
+         })
+       }
+       catch {
+       //console.log('maybe ive finllay found the issue area?');
+         //do nothing.
+       }
+
+
+        //console.log(JSON.stringify(userRef) + ' check userRef');
 
         //_teamPlayers = JSON.stringify(_teamPlayers, getCircularReplacer());
 
-        userRef.doc("players").update({
-            players: _teamPlayers,
+
+        dispatch(updateTeamPlayers(_teamPlayers))
+
+
+       //console.log('do we get here? 1');
+
+
+       //console.log(dragDropDisplayCount + ' hit beofre dragDropDisplayCount');
+        dragDropDisplayCount = dragDropDisplayCount + 1
+          dispatch(updateDragDropDisplayCount(dragDropDisplayCount))
+         //console.log(dragDropDisplayCount + ' hit after dragDropDisplayCount');
+
+         //console.log('do we get here? 2');
+
+       //console.log(playerId + ' playerId here hmmmm?');
+
+
+         try {
+        userRef.doc(playerId).set({
+            id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
           })
           .catch(error => this.setState({ errorMessage: error.message }))
 
+         //console.log('do we get here? 3');
 
-          firestore().collection(teamIdCode).doc(playerId).set({
-             id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}
+
+          firestore().collection(teamIdCodeGames).doc(playerId).set({
+             id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCodeGames, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
            })
+         }
+         catch {
+         //console.log('or is this the erro siuue area.');
+         }
+
+          //console.log('do we get here? 4');
+
+           let playerCodes = []
+
+
+           _teamPlayers.map(player => {
+
+             if (player.teamId === teamId && player.delete !== true) {
+
+             const playerId = player.playerId
+
+             const playerCode = {playerId: playerId}
+
+             playerCodes.push(playerCode)
+           }
+
+           })
+
+
+           try {
+           firestore().collection(teamIdCodeGames).doc(teamIdCodeGames).update({
+              playerIds: playerCodes,
+            })
+          }
+          catch {
+          //console.log('or mayne its this ara ok.');
+          }
+
+
+
 
 
     setInputs([{key: '', value: ''}]);
@@ -177,8 +314,8 @@ const InputPlayerName = (props)=>{
     return (
       <VStack width="100%" alignItems="center" mt="2">
         {inputs.map((input, key)=>(
-          <Stack minW="100%" mx="auto" bg="#fff" pt="3" pb="3" pl="3">
-            <TextInput placeholder={"Player Name"} style={styles.textInputName} placeholderTextColor="#666" textColor="#fff" value={input.value} onChangeText={(text)=>inputHandler(text,key)}/>
+          <Stack minW="100%" mx="auto" bg="#666" pt="3" pb="3" pl="3">
+            <TextInput placeholder={"Player Name"} style={styles.textInputName} placeholderTextColor="#ccc" textColor="#fff" value={input.value} onChangeText={(text)=>inputHandler(text,key)}/>
           </Stack>
         ))}
       </VStack>
@@ -187,10 +324,10 @@ const InputPlayerName = (props)=>{
 
         return (
           <Box minW="100%" shadow="7">
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#333', '#333']} style={styles.linearGradientAddPlayerHeading}>
 
-              <Text style={{fontSize: 20, color: '#fff', fontWeight: '400'}}>
-                Add New Player
+              <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', paddingBottom: 2}}>
+                Add New Player:
               </Text>
 
               <Box width="100%">
@@ -215,8 +352,37 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingTop: 10,
     paddingBottom: 15,
-    borderRadius: 5
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
   },
+  linearGradientAddPlayerHeading: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 15,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    paddingTop: 15,
+  },
+  textInputName: {
+    color: '#fff',
+    ...Platform.select({
+      ios: {
+        flex: 1,
+        maxHeight: 16,
+        lineHeight: 16,
+        minHeight: 16,
+      },
+      android: {
+        padding: 0,
+      },
+      default: {
+        flex: 1,
+        maxHeight: 16,
+        lineHeight: 16,
+        minHeight: 16,
+      }
+      })
+  }
 })
 
 export default InputPlayerName;

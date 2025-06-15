@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Component, useRef } from 'react'
-import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio, Platform } from 'react-native'
 import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, Icon, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, HStack, VStack, Select } from 'native-base';
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
@@ -8,6 +8,7 @@ import auth from '@react-native-firebase/auth';
 import { updateGames } from '../../Reducers/games';
 import { updateStatsBoard } from '../../Reducers/statsBoard';
 import { updateEventDisplayBoard } from '../../Reducers/eventDisplayBoard';
+import { updateGameOptionBoard } from '../../Reducers/gameOptionBoard';
 
 import PositionTimes from '../../Util/PositionTimes.js';
 
@@ -51,22 +52,79 @@ const GameOptionsUndo = (props)=>{
     const awayTeamName = _games[0].teamNames.awayTeamName
     const eventScoreText = 'Goal removed: ' + homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
     //try {
-      ////////////console.log('oppGoal add event hit here 1');
+      //////console.log('oppGoal add event hit here 1');
       _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
     /*
     }
     catch {
-      ////////////console.log('oppGoal add event hit here 2');
+      //////console.log('oppGoal add event hit here 2');
       _games[0].gameEvents = []
       _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
     }
     */
 
-    const eventBoardText = 'Opposition Goal removed'
+    const eventBoardText = 'Opposition Goal Removed'
 
     dispatch(updateGames(_games))
     dispatch(updateStatsBoard(false, 99999999))
+    dispatch(updateGameOptionBoard(false, 99999999))
     dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
+
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
+
+  }
+
+  const addGoal = () => {
+
+    let _games = []
+    try {
+      _games = [...games]
+    }
+    catch {
+      _games = [{...games}]
+    }
+
+    let eventBoardText = ''
+
+    let homeTeamScore = _games[0].score.homeTeam
+    homeTeamScore = homeTeamScore + 1
+    _games[0].score.homeTeam = homeTeamScore
+    const awayTeamScore = _games[0].score.awayTeam
+    const homeTeamName = _games[0].teamNames.homeTeamName
+    const awayTeamName = _games[0].teamNames.awayTeamName
+    const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
+    //try {
+      //////console.log('oppGoal add event hit here 1');
+      _games[0].gameEvents.push({eventType: 'goal', eventText: 'Own Goal by Opposition Player', eventTime: secondsElapsed})
+      _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
+    /*
+    }
+    catch {
+      //////console.log('oppGoal add event hit here 2');
+      _games[0].gameEvents = []
+      _games[0].gameEvents.push({eventType: 'goal', eventText: 'Own Goal by Opposition Player', eventTime: secondsElapsed})
+      _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
+    }
+    */
+
+    eventBoardText = 'Opposition Own-Goal Added'
+
+    dispatch(updateGames(_games))
+    dispatch(updateStatsBoard(false, 99999999))
+    dispatch(updateGameOptionBoard(false, 99999999))
+    dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
+
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
 
   }
 
@@ -88,16 +146,17 @@ const GameOptionsUndo = (props)=>{
     const awayTeamScore = _games[0].score.awayTeam
     const homeTeamName = _games[0].teamNames.homeTeamName
     const awayTeamName = _games[0].teamNames.awayTeamName
-    const eventScoreRemovedText = 'Goal removed'
+    //const eventScoreRemovedText = 'Goal removed'
     const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
     //try {
-      ////////////console.log('oppGoal add event hit here 1');
-      _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreRemovedText, eventTime: secondsElapsed, oppGoal: true})
+      //////console.log('oppGoal add event hit here 1');
+      _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: 'Goal removed', eventTime: secondsElapsed, oppGoal: true})
+      //_games[0].gameEvents.push({eventType: 'score', eventText: 'Goal removed', eventTime: secondsElapsed})
       _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
     /*
     }
     catch {
-      ////////////console.log('oppGoal add event hit here 2');
+      //////console.log('oppGoal add event hit here 2');
       _games[0].gameEvents = []
       _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
     }
@@ -107,17 +166,39 @@ const GameOptionsUndo = (props)=>{
 
     dispatch(updateGames(_games))
     dispatch(updateStatsBoard(false, 99999999))
+    dispatch(updateGameOptionBoard(false, 99999999))
     dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
+
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
 
   }
 
         return (
           <HStack>
-            <Box minW="28%"alignSelf="center" mt="3" shadow="5">
-              <Button minW="28%" bg="fuchsia.400" p="1" size="md" _text={{fontSize: "xs"}} onPress={() => removeOppGoal()}>-Opp. Goal</Button>
-            </Box>
-            <Box minW="28%" alignSelf="center" mt="3" ml="3" shadow="5">
-              <Button minW="28%" bg="fuchsia.400" p="1" size="md" _text={{fontSize: "xs"}} onPress={() => removeGoal()}>-Opp Own Goal</Button>
+          <Box minW="32%" alignSelf="center" mt="3" shadow="5">
+            <Button minW="32%" bg="fuchsia.400" p="2" size="md" _text={{fontSize: "xs"}} onPress={() => addGoal()}>
+              <HStack>
+                <Text style={{fontSize: 22, color: '#fff'}}>+ </Text>
+                  <VStack>
+                    <Text style={styles.buttonText}>Add Goal</Text>
+                  </VStack>
+                </HStack>
+              </Button>
+          </Box>
+            <Box minW="32%" alignSelf="center" mt="3" ml="3" shadow="5">
+              <Button minW="32%" bg="#666" p="2" size="md" _text={{fontSize: "sm"}} onPress={() => removeGoal()}>
+                <HStack>
+                  <Text style={{fontSize: 22, color: '#fff'}}>- </Text>
+                  <VStack>
+                    <Text style={styles.buttonText}>Remove Goal</Text>
+                  </VStack>
+                </HStack>
+              </Button>
             </Box>
         </HStack>
         )
@@ -128,6 +209,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    ...Platform.select({
+      ios: {
+        lineHeight:0
+      },
+      android: {
+        lineHeight: 18,
+      },
+      default: {
+        lineHeight: 0
+      }
+      })
+  }
 })
 
 export default GameOptionsUndo;

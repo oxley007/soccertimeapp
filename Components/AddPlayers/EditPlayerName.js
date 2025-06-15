@@ -71,7 +71,7 @@ const EditPlayerName = (props)=>{
       teamPlayers = [{...teamPlayers}];
     }
     */
-    //console.log(teamPlayers + ' fromo props 2 teamPlayers');
+  //console.log(teamPlayers + ' fromo props 2 teamPlayers');
 
     //let teamPlayersLength = teamPlayers.length
     let teamPlayersLength  = 0
@@ -84,14 +84,14 @@ const EditPlayerName = (props)=>{
 
     let teamType = 0
     try {
-      //console.log(props.teamType + ' props.teamType here');
+    //console.log(props.teamType + ' props.teamType here');
     teamType = props.teamType
   }
   catch {
     teamType = 0
   }
 
-    //console.log(teamPlayersLength + ' teamPlayersLength');
+  //console.log(teamPlayersLength + ' teamPlayersLength');
 
     let teamPlayersArray = []
 
@@ -102,17 +102,17 @@ const EditPlayerName = (props)=>{
       teamPlayersArray = []
     }
 
-    //console.log(JSON.stringify(teamPlayersArray) + ' need to check teamPlayersArray');
+  //console.log(JSON.stringify(teamPlayersArray) + ' need to check teamPlayersArray');
 
     inputs.map(input => {
       if (input.value === '') {
-        //console.log('value is null');
+      //console.log('value is null');
       }
       else {
-        //console.log(input.value + ' what is here ok input.value');
+      //console.log(input.value + ' what is here ok input.value');
         let [first, last] = input.value.split(/<[/\w\s-]+>|\s/g);
-        //console.log(first + ' what is here ok first');
-        //console.log(last + ' what is here ok last');
+      //console.log(first + ' what is here ok first');
+      //console.log(last + ' what is here ok last');
         if (last === undefined) {
           Alert.alert("Please add a last name to the player name." )
         }
@@ -126,36 +126,36 @@ const EditPlayerName = (props)=>{
         teamPlayers[playerIndex].playerName  = input.value
         games[0].teamPlayers[playerIndexGame].playerName = input.value
 
+
+
+
+
+     //console.log(JSON.stringify(teamPlayers) + ' need to cehk teamPlayers here.');
+
+        const teamIdCodeGames = games[0].teamIdCode
+
         dispatch(updateTeamPlayers(teamPlayers))
-        dispatch(updateGames(games))
 
-        ////console.log(JSON.stringify(userRef) + ' check userRef');
-
-        //teamPlayers = JSON.stringify(teamPlayers, getCircularReplacer());
-
-        const teamIdCode = playerData.teamIdCode
-
-        console.log('do i get here?');
-
-        console.log(JSON.stringify(teamPlayers) + ' need to cehk teamPlayers here.');
-        userRef.doc("players").update({
-            players: teamPlayers,
+        userRef.doc(playerId).update({
+            playerName: input.value
           })
           .catch(error => this.setState({ errorMessage: error.message }))
 
-          userRef.doc("games").update({
-              games: games,
-            })
-            .catch(error => this.setState({ errorMessage: error.message }))
 
-          console.log('do i get here 2?');
-
-          firestore().collection(teamIdCode).doc(playerId).update({
+          firestore().collection(teamIdCodeGames).doc(playerId).update({
              playerName: input.value
            })
 
+           dispatch(updateGames(games))
 
-      console.log('do i get here 3?');
+           const gameIdDb = games[0].gameIdDb
+
+           firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+              game: games[0],
+            })
+
+
+   //console.log('do i get here 3?');
 
     setInputs([{key: '', value: ''}]);
   }
@@ -179,6 +179,55 @@ const EditPlayerName = (props)=>{
     )
   }
 
+  const deletePlayer = async (deleteValue) => {
+    const playerId = playerData.playerId;
+    const playerDocId = playerData.id;
+    const teamIdCodeGames = games[0].teamIdCode;
+    const gameIdDb = games[0].gameIdDb;
+    const teamId = games[0].teamId;
+
+    try {
+      // 1. Remove player from local arrays
+      const updatedTeamPlayers = teamPlayers.filter(p => p.id !== playerDocId);
+      const updatedGamePlayers = games[0].teamPlayers.filter(p => p.id !== playerDocId);
+
+      // 2. Update Redux state
+      dispatch(updateTeamPlayers(updatedTeamPlayers));
+      const updatedGames = [...games];
+      updatedGames[0].teamPlayers = updatedGamePlayers;
+      dispatch(updateGames(updatedGames));
+
+      // 3. Delete player document from `userRef` collection
+      await userRef.doc(playerId).delete();
+
+      // 4. Delete player document from team collection (if stored separately)
+      await firestore().collection(teamIdCodeGames).doc(playerId).delete();
+
+      // 5. Update game document in Firebase
+      await firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+        game: updatedGames[0]
+      });
+
+      // 6. Rebuild playerIds list and update in team doc
+      const playerCodes = updatedTeamPlayers
+        .filter(player => player.teamId === teamId && player.delete !== true)
+        .map(player => ({ playerId: player.playerId }));
+
+      await firestore().collection(teamIdCodeGames).doc(teamIdCodeGames).update({
+        playerIds: playerCodes
+      });
+
+      // 7. Continue setup
+      continueSetup();
+
+    } catch (error) {
+      console.error("Error deleting player:", error);
+      // Optionally handle with state
+      // this.setState({ errorMessage: error.message });
+    }
+  };
+
+  /*
   const deletePlayer = (deleteValue) => {
 
     const playerId = playerData.playerId
@@ -188,37 +237,59 @@ const EditPlayerName = (props)=>{
     teamPlayers[playerIndex].delete  = deleteValue
     games[0].teamPlayers[playerIndexGame].delete = deleteValue
 
+    //dispatch(updateTeamPlayers(teamPlayers))
+    //dispatch(updateGames(games))
+
     dispatch(updateTeamPlayers(teamPlayers))
-    dispatch(updateGames(games))
 
-    ////console.log(JSON.stringify(userRef) + ' check userRef');
+    const teamIdCodeGames = games[0].teamIdCode
 
-    //teamPlayers = JSON.stringify(teamPlayers, getCircularReplacer());
-
-    const teamIdCode = playerData.teamIdCode
-
-    console.log('do i get here?');
-
-    console.log(JSON.stringify(teamPlayers) + ' need to cehk teamPlayers here.');
-    userRef.doc("players").update({
-        players: teamPlayers,
+    userRef.doc(playerId).set({
+        delete: deleteValue
       })
       .catch(error => this.setState({ errorMessage: error.message }))
 
-      userRef.doc("games").update({
-          games: games,
-        })
-        .catch(error => this.setState({ errorMessage: error.message }))
 
-      console.log('do i get here 2?');
 
-      firestore().collection(teamIdCode).doc(playerId).update({
+      firestore().collection(teamIdCodeGames).doc(playerId).update({
          delete: deleteValue
        })
+
+       dispatch(updateGames(games))
+
+       const gameIdDb = games[0].gameIdDb
+
+
+       firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+          game: games[0],
+        })
+
+
+        let playerCodes = []
+
+
+        teamPlayers.map(player => {
+          console.log(player.playerName + ' player.playerName is?');
+        if (player.teamId === teamId && player.delete !== true) {
+          const playerId = player.playerId
+
+          const playerCode = {playerId: playerId}
+
+          playerCodes.push(playerCode)
+        }
+
+        })
+
+        firestore().collection(teamIdCodeGames).doc(teamIdCodeGames).update({
+           playerIds: playerCodes,
+         })
+
+
 
        continueSetup()
 
   }
+  */
 
   const continueSetup = () => {
 
@@ -231,9 +302,11 @@ const EditPlayerName = (props)=>{
   }
 
         return (
+          <Center>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradientBg}>
           <Container maxW="88%" ml="5" mr="5">
 
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
 
               <Text style={{fontSize: 20, color: '#fff', fontWeight: '400'}}>
                 Edit {playerData.playerName}
@@ -250,17 +323,16 @@ const EditPlayerName = (props)=>{
               {playerData.delete !== true &&
               <Button minW="100%" mt="5" size="md" _text={{fontSize: "xl"}} variant="subtle" colorScheme="secondary" onPress={() => deletePlayer(true)}>Delete Player</Button>
               }
-              {playerData.delete === true &&
-              <Button minW="100%" mt="5" size="md" _text={{fontSize: "xl"}} variant="subtle" onPress={() => deletePlayer(false)}>Restore Player</Button>
-              }
 
           <Box minW="100%" safeAreaTop alignSelf="center">
 
       <HStack alignItems="center" safeAreaBottom shadow={6}>
-      <Button minW="100%" bg="tertiary.400" size="md" _text={{fontSize: "xl"}} variant="subtle" onPress={() => continueSetup()}>Back</Button>
+      <Button minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Back</Button>
             </HStack>
     </Box>
     </Container>
+    </LinearGradient>
+    </Center>
         )
     }
 
@@ -277,6 +349,30 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20
   },
+  linearGradientBg: {
+    minWidth: '100%',
+    minHeight: '100%',
+  },
+  textInputName: {
+    color: '#333',
+    ...Platform.select({
+      ios: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      },
+      android: {
+        padding: 0,
+      },
+      default: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      }
+      })
+  }
 })
 
 export default EditPlayerName;

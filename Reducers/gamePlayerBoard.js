@@ -16,12 +16,12 @@ const initialState = {
   playerId: 99999999,
 };
 
-//console.log('hitting rootReducer');
-//console.log(initialState);
+console.log('hitting rootReducer');
+console.log(initialState);
 
 //const rootReducer = (state = initialState, action) => {
 export default (state = initialState, action) => {
-  //console.log(action.gamePlayerBoard + ' gamePlayerBoard check n');
+//console.log(action.gamePlayerBoard + ' gamePlayerBoard check n');
   switch (action.type) {
     case ADD_GAMEPLAYERBOARD:
     return {

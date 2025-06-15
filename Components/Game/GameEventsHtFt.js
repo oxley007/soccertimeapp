@@ -127,7 +127,7 @@ const GameEventsHtFt = (props)=>{
 
         return (
           <Center>
-          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
             {gameEvents()}
             </LinearGradient>
           </Center>

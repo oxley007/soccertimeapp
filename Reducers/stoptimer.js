@@ -14,12 +14,12 @@ const initialState = {
   stoptimer: false,
 };
 
-//console.log('hitting rootReducer');
-//console.log(initialState);
+console.log('hitting rootReducer');
+console.log(initialState);
 
 //const rootReducer = (state = initialState, action) => {
 export default (state = initialState, action) => {
-  //console.log(action.stoptimer + ' stoptimer check n');
+//console.log(action.stoptimer + ' stoptimer check n');
   switch (action.type) {
     case ADD_STOPTIMER:
     return {

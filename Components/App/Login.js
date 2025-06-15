@@ -24,10 +24,10 @@ export default class Login extends React.Component {
       .then(data => {
         let uid = data.user.uid;
         this.setState({ uid: uid });
-        console.log("User ID :- ", data.user.uid);
+     //console.log("User ID :- ", data.user.uid);
       })
       .then(() => {
-        console.log('signout function hit?');
+     //console.log('signout function hit?');
         this.setState({
           games: [],
        });

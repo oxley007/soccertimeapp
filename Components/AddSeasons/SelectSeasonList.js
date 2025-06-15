@@ -70,7 +70,7 @@ const SelectSeasonList = (props)=>{
             <View style={{marginBottom: 10}}>
             {item.delete !== true &&
               <Box shadow="7">
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
                 <Box borderBottomWidth="1" _dark={{
                   borderColor: "muted.50"
                 }} borderColor="muted.800" pl={["0", "4"]} pr={["0", "5"]} py="2">

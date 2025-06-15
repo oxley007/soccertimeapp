@@ -72,7 +72,7 @@ const EditSeason = (props)=>{
       seasons = [{...seasons}];
     }
     */
-    //console.log(seasons + ' fromo props 2 seasons');
+  //console.log(seasons + ' fromo props 2 seasons');
 
     //let seasonsLength = seasons.length
     let seasonsLength  = 0
@@ -85,14 +85,14 @@ const EditSeason = (props)=>{
 
     let teamType = 0
     try {
-      //console.log(props.teamType + ' props.teamType here');
+    //console.log(props.teamType + ' props.teamType here');
     teamType = props.teamType
   }
   catch {
     teamType = 0
   }
 
-    //console.log(seasonsLength + ' seasonsLength');
+  //console.log(seasonsLength + ' seasonsLength');
 
     let seasonsArray = []
 
@@ -103,14 +103,14 @@ const EditSeason = (props)=>{
       seasonsArray = []
     }
 
-    //console.log(JSON.stringify(seasonsArray) + ' need to check seasonsArray');
+  //console.log(JSON.stringify(seasonsArray) + ' need to check seasonsArray');
 
     inputs.map(input => {
       if (input.value === '') {
-        //console.log('value is null');
+      //console.log('value is null');
       }
       else {
-        //console.log(input.value + ' what is here ok input.value');
+      //console.log(input.value + ' what is here ok input.value');
 
 
         const seasonIndex = seasons.findIndex(x => x.id === seasonData.id);
@@ -121,27 +121,32 @@ const EditSeason = (props)=>{
         const seasonsDisplayIdNew = seasonIndex
         games[0].season.season = input.value
 
-        dispatch(updateSeasons(seasons, seasonDisplay, seasonsDisplayIdNew))
-        dispatch(updateGames(games))
 
-        ////console.log(JSON.stringify(userRef) + ' check userRef');
+
+
+      //console.log(JSON.stringify(userRef) + ' check userRef');
 
         //seasons = JSON.stringify(seasons, getCircularReplacer());
 
 
 
-        console.log('do i get here?');
+     //console.log('do i get here?');
+        dispatch(updateSeasons(seasons, seasonDisplay, seasonsDisplayIdNew))
 
-        console.log(JSON.stringify(seasons) + ' need to cehk seasons here.');
+     //console.log(JSON.stringify(seasons) + ' need to cehk seasons here.');
         userRef.doc("players").update({
             seasons: seasons,
           })
           .catch(error => this.setState({ errorMessage: error.message }))
 
-          userRef.doc("games").update({
-              games: games,
-            })
-            .catch(error => this.setState({ errorMessage: error.message }))
+        dispatch(updateGames(games))
+
+        const teamIdCodeGames = games[0].teamIdCode
+        const gameIdDb = games[0].gameIdDb
+
+        firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+           game: games[0],
+         })
 
 
 
@@ -176,32 +181,28 @@ const EditSeason = (props)=>{
     seasons[playerIndex].delete  = deleteValue
     games[0].season[playerIndexGame].delete = deleteValue
 
-    dispatch(updateSeasons(seasons))
+
     dispatch(updateGames(games))
 
-    ////console.log(JSON.stringify(userRef) + ' check userRef');
+    const teamIdCodeGames = games[0].teamIdCode
+    const gameIdDb = games[0].gameIdDb
 
-    //seasons = JSON.stringify(seasons, getCircularReplacer());
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: games[0],
+     })
 
-    const teamIdCode = seasonData.teamIdCode
+    dispatch(updateSeasons(seasons))
 
-    console.log('do i get here?');
+ //console.log('do i get here?');
 
-    console.log(JSON.stringify(seasons) + ' need to cehk seasons here.');
-    userRef.doc("players").update({
-        players: seasons,
+ //console.log(JSON.stringify(seasons) + ' need to cehk seasons here.');
+    userRef.doc("seasons").update({
+        seasons: _seasons,
       })
       .catch(error => this.setState({ errorMessage: error.message }))
 
-      userRef.doc("games").update({
-          games: games,
-        })
-        .catch(error => this.setState({ errorMessage: error.message }))
-
-      console.log('do i get here 2?');
-
-      firestore().collection(teamIdCode).doc(playerId).update({
-         delete: deleteValue
+      firestore().collection(teamIdCodeGames).doc('seasons').update({
+         seasons: _seasons,
        })
 
        continueSetup()
@@ -217,7 +218,7 @@ const EditSeason = (props)=>{
         return (
           <Container maxW="88%" ml="5" mr="5">
 
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradient}>
 
               <Text style={{fontSize: 20, color: '#fff', fontWeight: '400'}}>
                 Edit {seasonData.playerName}
@@ -255,6 +256,26 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20
   },
+  textInputName: {
+    color: '#333',
+    ...Platform.select({
+      ios: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      },
+      android: {
+        padding: 0,
+      },
+      default: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      }
+      })
+  }
 })
 
 export default EditSeason;

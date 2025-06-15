@@ -13,6 +13,27 @@ import gamePlayerBoard from './gamePlayerBoard';
 import eventDisplayBoard from './eventDisplayBoard';
 import seasons from './seasons';
 import prevGames from './prevGames';
+import statsSort from './statsSort';
+import playerUserData from './playerUserData';
+import iap from './iap';
+import userProfile from './userProfile'
+import playerIndex from './playerIndex'
+import sortIndex from './sortIndex'
+import exitGameFlag from './exitGameFlag'
+import dragDropDisplayCount from './dragDropDisplayCount'
+import checkSort from './checkSort'
+import posArray from './posArray'
+import checkSortPlayer from './checkSortPlayer'
+import awayTeamDetails from './awayTeamDetails'
+import gameBoardHideBtn from './gameBoardHideBtn'
+import copyDisplayBoard from './copyDisplayBoard'
+import exitGameFlagOptions from './exitGameFlagOptions'
+import parentCoachView from './parentCoachView'
+import eventsVersion from './eventsVersion'
+import gameOptionBoardFrom from './gameOptionBoardFrom'
+import checkSortIap from './checkSortIap'
+import fromContinueGame from './fromContinueGame'
+
 
 export default combineReducers({
   games,
@@ -27,4 +48,24 @@ export default combineReducers({
   eventDisplayBoard,
   seasons,
   prevGames,
+  statsSort,
+  playerUserData,
+  iap,
+  userProfile,
+  playerIndex,
+  sortIndex,
+  exitGameFlag,
+  dragDropDisplayCount,
+  checkSort,
+  posArray,
+  checkSortPlayer,
+  awayTeamDetails,
+  gameBoardHideBtn,
+  copyDisplayBoard,
+  exitGameFlagOptions,
+  parentCoachView,
+  eventsVersion,
+  gameOptionBoardFrom,
+  checkSortIap,
+  fromContinueGame,
 });

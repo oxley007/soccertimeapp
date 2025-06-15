@@ -18,12 +18,12 @@ const initialState = {
   eventText: 99999999,
 };
 
-//console.log('hitting rootReducer');
-//console.log(initialState);
+console.log('hitting rootReducer');
+console.log(initialState);
 
 //const rootReducer = (state = initialState, action) => {
 export default (state = initialState, action) => {
-  //console.log(action.eventDisplayBoard + ' eventDisplayBoard check n');
+//console.log(action.eventDisplayBoard + ' eventDisplayBoard check n');
   switch (action.type) {
     case ADD_EVENTDISPLAYBOARD:
     return {

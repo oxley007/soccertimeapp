@@ -21,7 +21,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_TEAMPLAYERS:
-    //console.log(action.teamPlayers);
+  //console.log(action.teamPlayers);
       return {
         ...state,
         teamPlayers: action.teamPlayers,

@@ -1,173 +1,401 @@
-// SignUp.js
-import React from 'react';
-import { StyleSheet, Text, TextInput, View, Image } from 'react-native';
-import {Row,Col,Container,Content,Form, Item, Input, Label, H1, Button} from 'native-base';
-
-//import RNRestart from 'react-native-restart';
-//import LinearGradient from 'react-native-linear-gradient';
+import React, { useEffect, useState, Component, useRef } from 'react'
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio, Animated } from 'react-native'
+import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, PresenceTransition, HStack, VStack } from 'native-base';
+import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import LinearGradient from 'react-native-linear-gradient';
+import RNRestart from 'react-native-restart';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
-import { connect } from "react-redux";
+
+import { updateDragDropDisplayCount } from '../../Reducers/dragDropDisplayCount';
+import { updateEventDisplayBoard } from '../../Reducers/eventDisplayBoard';
+import { updateExitGameFlag } from '../../Reducers/exitGameFlag';
+import { updateGameOptionBoard } from '../../Reducers/gameOptionBoard';
+import { updateGamePlayerBoard } from '../../Reducers/gamePlayerBoard';
 import { updateGames } from '../../Reducers/games';
-//import { updateGameId } from '../../Reducers/gameId';
+import { updateGameSetup } from '../../Reducers/gameSetup';
+import { updateGameStatus } from '../../Reducers/gameStatus';
+import { updateIap } from '../../Reducers/iap';
+import { updatePlayerIndex } from '../../Reducers/playerIndex';
+import { updatePlayerUserData } from '../../Reducers/playerUserData';
+import { updatePrevGames } from '../../Reducers/prevGames';
+import { updateSeasons } from '../../Reducers/seasons';
+import { updateSortIndex } from '../../Reducers/sortIndex';
+import { updateStatsBoard } from '../../Reducers/statsBoard';
+import { updateStatsSort } from '../../Reducers/statsSort';
+import { updateStoptimer } from '../../Reducers/stoptimer';
+import { updateStopwatch } from '../../Reducers/stopwatch';
+import { updateTeamNames } from '../../Reducers/teamNames';
+import { updateTeamPlayers } from '../../Reducers/teamPlayers';
+import { updateUserProfile } from '../../Reducers/userProfile';
 
-class SignOut extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    const { currentUser } = auth()
-    this.ref = firestore().collection(currentUser.uid);
-    this.state = {
-        textInput: '',
-        loading: true,
-        games: [],
-    };
+
+
+const SignOut = (props)=>{
+
+  //const [getTeam, setGetTeam] = useState(null);
+
+  //let uid = useSelector(state => state.uid);
+  //const [uidState, setu] = useState(true);
+
+  const dispatch = useDispatch()
+
+  const { currentUser } = auth()
+  const userRef = firestore().collection(currentUser.uid);
+
+  const { navigate } = props.navigation;
+
+
+  const signOutReduxClear = () => {
+
+    const dragDropDisplayCount = 0
+    dispatch(updateDragDropDisplayCount(dragDropDisplayCount))
+
+    const eventDisplayBoard = false
+    const playerId = 99999999
+    const eventText = 99999999
+    dispatch(updateEventDisplayBoard(eventDisplayBoard, playerId, eventText))
+
+    const exitGameFlag = false
+    dispatch(updateExitGameFlag(exitGameFlag))
+
+    const gameOptionBoard = false
+    const gameOptionBoardplayerId = 99999999
+    dispatch(updateGameOptionBoard(gameOptionBoard, gameOptionBoardplayerId))
+
+    const gamePlayerBoard = false
+    const gamePlayerBoardplayerId = 99999999
+    dispatch(updateGamePlayerBoard(gamePlayerBoard, gamePlayerBoardplayerId))
+
+    const games = []
+    dispatch(updateGames(games))
+
+    const gameSetup = []
+    dispatch(updateGameSetup(gameSetup))
+
+    const gameStatus = 0
+    dispatch(updateGameStatus(gameStatus))
+
+    const pro_forever_indiv = [{purchased: false, expiryDate: null}]
+    const pro_yearly_indiv = [{purchased: false, expiryDate: null}]
+    const pro_yearly_team = [{purchased: false, expiryDate: null}]
+    const pro_forever_team = [{purchased: false, expiryDate: null}]
+    const pro_yearly_player = [{purchased: false, expiryDate: null}]
+    const pro_forever_player = [{purchased: false, expiryDate: null}]
+    dispatch(updateIap(pro_forever_indiv, pro_yearly_indiv, pro_yearly_team, pro_forever_team, pro_yearly_player, pro_forever_player))
+
+    const playerIndex = 0
+    dispatch(updatePlayerIndex(playerIndex))
+
+    const teamsPlayerUserData = []
+    const playersPlayerUserData = []
+    const seasonsPlayerUserData = []
+    const seasonsDisplayPlayerUserData = ''
+    const seasonsDisplayIdPlayerUserData = 99999998
+    dispatch(updatePlayerUserData(teamsPlayerUserData, playersPlayerUserData, seasonsPlayerUserData, seasonsDisplayPlayerUserData, seasonsDisplayIdPlayerUserData))
+
+    const teamPrevGames = []
+    const seasonPrevGames = []
+    dispatch(updatePrevGames(teamPrevGames, seasonPrevGames))
+
+    const seasons = []
+    const seasonsDisplay = ''
+    const seasonsDisplayId = 99999998
+    dispatch(updateSeasons(seasons, seasonsDisplay, seasonsDisplayId))
+
+    const sortIndex = 0
+    const sortIndexType = 0
+    dispatch(updateSortIndex(sortIndex, sortIndexType))
+
+    const statsBoard = false
+    const playerIdstatsBoard = 99999999
+    dispatch(updateStatsBoard(statsBoard, playerIdstatsBoard))
+
+    const statsSort = []
+    dispatch(updateStatsSort(statsSort))
+
+    const stoptimer = false
+    dispatch(updateStoptimer(stoptimer))
+
+    const secondsElapsed = 0
+    const laps = []
+    const lastClearedIncrementer = null
+    const incrementer = null
+    const avgBall = []
+    const sixtySecondsMark = 0
+    const stopTimer = false
+    const pauseTimer = false
+    dispatch(updateStopwatch(secondsElapsed, laps, lastClearedIncrementer, incrementer, avgBall, sixtySecondsMark, stopTimer, pauseTimer))
+
+    const teamNames = []
+    dispatch(updateTeamNames(teamNames))
+
+    const teamPlayers = []
+    dispatch(updateTeamPlayers(teamPlayers))
+
+    const userProfile = 0
+    dispatch(updateUserProfile(userProfile))
+
   }
 
-  state = {
-    email: '',
-   password: '',
-   uid: '',
-   errorMessage: null,
-   games: this.props.games.games || [],
-  }
 
-  handleChange = ( games ) => {
-    this.setState({ games });
-  };
+  const signOutButton = async () => {
 
-/*
-  handleSignUp = () => {
-    firebase
-        .auth()
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then(data => {
-          let uid = data.user.uid;
-          this.setState({ uid: uid });
-      console.log("User ID :- ", data.user.uid);
-   })
-        .then(data => {return firebase.firestore().collection(this.state.uid).doc("Hello1").set({
-          gameId: 1,
-          gameName: 'Game two hello1!',
-          uid: this.state.uid,
+
+    if (Platform.OS !== 'ios') {
+
+      try {
+        await GoogleSignin.signOut();
+        auth()
+        .signOut()
+        .then(function() {
+          //RNRestart.restart();
+       //console.log('User signed out!');
+          //navigate('SignUp');
+          // Sign-out successful.
+          signOutReduxClear()
+          navigate('Loading', {
+            signedOut: true
+          });
         })
-      })
-        .then(() => this.props.navigation.navigate('GameAddPlayers'))
-        .catch(error => this.setState({ errorMessage: error.message }))
-  console.log('handleSignUp')
-}
-*/
+          .catch(function(error) {
+         //console.log(error);
+          // An error happened.
+        });
+        //navigate('SignUp');
+        //this.setState({ uid: null }); // Remember to remove the user from your app's state as well
+      } catch (error) {
+        console.error(error);
+        auth()
+        .signOut()
+        .then(function() {
+          //RNRestart.restart();
+       //console.log('User signed out!');
+          //navigate('SignUp');
+          // Sign-out successful.
+          signOutReduxClear()
+          navigate('Loading', {
+            signedOut: true
+          });
+        })
+          .catch(function(error) {
+         //console.log(error);
+          // An error happened.
+        });
+      }
+    }
+    else {
+      try {
+        auth().signOut().then(function() {
+            try
+            {
+              signOutReduxClear()
+              navigate('Loading', {
+                signedOut: true
+              });
+            }
+            catch {
+              navigate('Loading', {
+                signedOut: true
+              });
+            }
+        })
+        //navigate('SignUp');
+      } catch (error) {
+     //console.log(error);
+       navigate('Loading', {
+         signedOut: true
+       });
+      }
+
+    }
+
+    /*
+    const dragDropDisplayCount = 0
+    dispatch(updateDragDropDisplayCount(dragDropDisplayCount))
+
+    const eventDisplayBoard = false
+    const playerId = 99999999
+    const eventText = 99999999
+    dispatch(updateEventDisplayBoard(eventDisplayBoard, playerId, eventText))
+
+    const exitGameFlag = false
+    dispatch(updateExitGameFlag(exitGameFlag))
+
+    const gameOptionBoard = false
+    const gameOptionBoardplayerId = 99999999
+    dispatch(updateGameOptionBoard(gameOptionBoard, gameOptionBoardplayerId))
+
+    const gamePlayerBoard = false
+    const gamePlayerBoardplayerId = 99999999
+    dispatch(updateGamePlayerBoard(gamePlayerBoard, gamePlayerBoardplayerId))
+
+    const games = []
+    dispatch(updateGames(games))
+
+    const gameSetup = []
+    dispatch(updateGameSetup(gameSetup))
+
+    const gameStatus = 0
+    dispatch(updateGameStatus(gameStatus))
+
+    const pro_forever_indiv = [{purchased: false, expiryDate: null}]
+    const pro_yearly_indiv = [{purchased: false, expiryDate: null}]
+    const pro_yearly_team = [{purchased: false, expiryDate: null}]
+    const pro_forever_team = [{purchased: false, expiryDate: null}]
+    const pro_yearly_player = [{purchased: false, expiryDate: null}]
+    const pro_forever_player = [{purchased: false, expiryDate: null}]
+    dispatch(updateIap(pro_forever_indiv, pro_yearly_indiv, pro_yearly_team, pro_forever_team, pro_yearly_player, pro_forever_player))
+
+    const playerIndex = 0
+    dispatch(updatePlayerIndex(playerIndex))
+
+    const teamsPlayerUserData = []
+    const playersPlayerUserData = []
+    const seasonsPlayerUserData = []
+    const seasonsDisplayPlayerUserData = ''
+    const seasonsDisplayIdPlayerUserData = 99999998
+    dispatch(updatePlayerUserData(teamsPlayerUserData, playersPlayerUserData, seasonsPlayerUserData, seasonsDisplayPlayerUserData, seasonsDisplayIdPlayerUserData))
+
+    const teamPrevGames = []
+    const seasonPrevGames = []
+    dispatch(updatePrevGames(teamPrevGames, seasonPrevGames))
+
+    const seasons = []
+    const seasonsDisplay = ''
+    const seasonsDisplayId = 99999998
+    dispatch(updateSeasons(seasons, seasonsDisplay, seasonsDisplayId))
+
+    const sortIndex = 0
+    const sortIndexType = 0
+    dispatch(updateSortIndex(sortIndex, sortIndexType))
+
+    const statsBoard = false
+    const playerIdstatsBoard = 99999999
+    dispatch(updateStatsBoard(statsBoard, playerIdstatsBoard))
+
+    const statsSort = []
+    dispatch(updateStatsSort(statsSort))
+
+    const stoptimer = false
+    dispatch(updateStoptimer(stoptimer))
+
+    const secondsElapsed = 0
+    const laps = []
+    const lastClearedIncrementer = null
+    const incrementer = null
+    const avgBall = []
+    const sixtySecondsMark = 0
+    const stopTimer = false
+    const pauseTimer = false
+    dispatch(updateStopwatch(secondsElapsed, laps, lastClearedIncrementer, incrementer, avgBall, sixtySecondsMark, stopTimer, pauseTimer))
+
+    const teamNames = []
+    dispatch(updateTeamNames(teamNames))
+
+    const teamPlayers = []
+    dispatch(updateTeamPlayers(teamPlayers))
+
+    const userProfile = 0
+    dispatch(updateUserProfile(userProfile))
+    */
 
 
-signOutUser = () => {
+};
 
-  /*
-  this.setState({
-    games: [],
-  }, function () {
-    const { games } = this.state
-    this.props.dispatch(updateGames(this.state.games));
-  })
+        return (
+          <Container maxW="100%">
+          <Center style={{height:'100%',width:'100%',alignItems: 'center'}}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradientBg}>
+              <ScrollView style={{height:'100%',width:'100%'}}>
+                <Box style={{paddingTop: 20}}>
+                  <Center>
+                    <Image
+                        style={styles.tinyLogo}
+                        source={require('../../assets/SoccerTimeLive-logoMain400pxTrans.png')}
+                      />
+                  </Center>
+                </Box>
+                <Center>
+                <Box style={{paddingTop: 40}}>
+                <Center>
+                <Button style={styles.textButton}
+                  onPress={() => signOutButton()}
+                  >
+                  <Text style={styles.whiteText}>Sign Out</Text>
+                </Button>
+                </Center>
+                </Box>
+                </Center>
+                <Box style={{paddingTop: 40}}>
+                <Center>
+                <Button transparent light style={styles.textButton}
+                  onPress={() => navigate('HomeSelectProfile')}
+                  >
+                  <Text style={styles.whiteText}>Back to Home.</Text>
+                </Button>
+                </Center>
+                </Box>
+                </ScrollView>
+            </LinearGradient>
+          </Center>
+          </Container>
 
-  this.setState({
-    keyID: '0',
-    gameID: '0',
-  }, function () {
-    const { keyID, gameID } = this.state
-    this.props.dispatch(updateGameId(this.state.keyID, this.state.gameID));
-  })
-  */
+        )
+    }
 
-  auth().signOut().then(function() {
-    RNRestart.Restart()
-    console.log('hit restart / signout.');
-  // Sign-out successful.
-  })
-  .catch(function(error) {
-  // An error happened.
-  });
-}
-
-/*
-signOutUser = () => {
-  firebase.auth().signOut()
-  .then(RNRestart.Restart());
-}
-*/
-
-
-render() {
-    return (
-      <Container>
-            <Image
-            source={require('../../assets/4dot6logo-transparent.png')}
-            style={{ width: '90%', justifyContent: 'center', alignItems: 'center', resizeMode: 'contain' }}
-            />
-            <H1 style={styles.whiteText}>Click the below button to sign out of 4dot6</H1>
-            {this.state.errorMessage &&
-            <Text style={{ color: 'red' }}>
-                {this.state.errorMessage}
-            </Text>}
-            <Button rounded large warning style={styles.largeButton}
-              onPress={() => this.signOutUser()} >
-                <Text style={styles.buttonTextBack}>Sign Out</Text>
-            </Button>
-            <Button transparent light style={styles.textButton}
-              onPress={() => this.props.navigation.navigate('Login')}
-              >
-              <Text style={styles.whiteText}>Or click here to go back</Text>
-            </Button>
-      </Container>
-    )
-  }
-}
-
-const mapStateToProps = state => ({
-  games: state.games,
-});
-
-export default connect(mapStateToProps)(SignOut);
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  linearGradient: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5,
   },
-  textInput: {
-    color: '#fff',
-    marginTop: 8
+  buttonText: {
+    fontSize: 18,
+    fontFamily: 'Gill Sans',
+    textAlign: 'center',
+    margin: 10,
+    color: '#ffffff',
+    backgroundColor: 'transparent',
   },
-  whiteText: {
-    color: '#fff',
+  fadingContainer: {
+    padding: 20,
+    backgroundColor: 'powderblue',
   },
-  largeButton: {
-    width: '90%',
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 0,
-    shadowOpacity: 0,
-    marginTop: 20,
-    marginRight: 'auto',
-    marginLeft: 'auto',
+  tinyLogo: {
+    //width: 400,
+    resizeMode: 'contain',
+    marginBottom: 50
+  },
+  backgroundImage: {
+      flex: 1,
+      resizeMode: 'cover', // or 'stretch'
+  },
+  linearGradientBg: {
+    minWidth: '100%',
+    width: '100%'
   },
   textButton: {
-    width: '90%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 0,
-    shadowOpacity: 0,
-    marginRight: 'auto',
-    marginLeft: 'auto',
+    minWidth: '80%',
+    backgroundColor: '#E879F9'
   },
-  buttonTextBack: {
-    fontSize: 20,
-    color: '#c471ed',
-    marginTop: 'auto',
-    marginRight: 'auto',
-    marginBottom: 'auto',
-    marginLeft: 'auto',
-    fontWeight: '200',
-  },
+  whiteText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#ffffff',
+    minWidth: '80%'
+  }
 })
+
+export default SignOut;

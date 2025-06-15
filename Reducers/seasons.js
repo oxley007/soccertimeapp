@@ -25,7 +25,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_SEASONS:
-    //console.log(action.seasons);
+  //console.log(action.seasons);
       return {
         ...state,
         seasons: action.seasons,

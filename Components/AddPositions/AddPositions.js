@@ -37,9 +37,9 @@ const AddPositions = (props)=>{
   const testOne = false
 
   let playerId = props.playerId
-  ////console.log(playerId + ' checking here playerId');
+//console.log(playerId + ' checking here playerId');
   const playerRef = games[0].teamPlayers.findIndex(x => x.id === playerId);
-  ////console.log(playerRef + ' checking here playerRef');
+//console.log(playerRef + ' checking here playerRef');
   let currentPosition = 'NA'
   try {
     currentPosition = games[0].teamPlayers[playerRef].currentPosition
@@ -59,17 +59,17 @@ const AddPositions = (props)=>{
       _games = [{...games}]
     }
 
-    ////console.log(playerId + ' what is playerId?');
+  //console.log(playerId + ' what is playerId?');
 
-    ////console.log(playerRef + ' playerRef is??');
+  //console.log(playerRef + ' playerRef is??');
 
     //_games[0].teamPlayers.find(x => x.id === playerId).foo;
 
 
-    ////console.log(JSON.stringify(_games[0]) + ' _games[0]');
-    ////console.log(JSON.stringify(_games[0].teamPlayers) + ' _games[0].teamPlayers');
-    ////console.log(_games[0].teamPlayers[playerRef] + ' _games[0].teamPlayers[playerRef]');
-    ////console.log(_games[0].teamPlayers[playerRef].currentPosition + ' _games[0].teamPlayers[playerRef]');
+  //console.log(JSON.stringify(_games[0]) + ' _games[0]');
+  //console.log(JSON.stringify(_games[0].teamPlayers) + ' _games[0].teamPlayers');
+  //console.log(_games[0].teamPlayers[playerRef] + ' _games[0].teamPlayers[playerRef]');
+  //console.log(_games[0].teamPlayers[playerRef].currentPosition + ' _games[0].teamPlayers[playerRef]');
 
 
     _games[0].teamPlayers[playerRef].currentPosition = newPosition
@@ -120,6 +120,13 @@ const AddPositions = (props)=>{
     dispatch(updateGames(_games))
     //currentPosition = newPosition
 
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
+
   }
 
   const removePosition = () => {
@@ -136,6 +143,13 @@ const AddPositions = (props)=>{
 
     dispatch(updateGames(_games))
     //currentPosition = 'NA'
+
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
 
   }
 

@@ -25,25 +25,79 @@ const SelectGameTime = (props)=>{
   const userRef = firestore().collection(currentUser.uid);
   const teamRef = firestore().collection('teamTest1')
 
+  let checkSort = useSelector(state => state.checkSort.checkSort);
 
 
+  /*
+  useEffect(() => {
+
+    if (checkSort !== 2) {
+      const valueInt = 0
+      setGameTime(valueInt)
+    }
+
+  }, [checkSort])
+  */
+
+  useEffect(() => {
+
+    let _games = []
+    try {
+      _games = [...games]
+    }
+    catch {
+      _games = [{...games}]
+    }
+
+    console.log(props.whereFrom + ' props.whereFrom wher is this from?');
+
+    ///if (props.whereFrom === 1) {
+      //const teamName = _games[0].teamNames.awayTeamName
+      const valueInt = _games[0].gameHalfTime
+      setGameTime(valueInt)
+    //}
+
+  },[])
 
   const addGameTimeSelect = (value: string) => {
+
+    let _games = []
+    try {
+      _games = [...games]
+    }
+    catch {
+      _games = [{...games}]
+    }
 
     let valueInt = Number(value)
     valueInt = valueInt * 60
     setGameTime(valueInt)
-    games[0].gameHalfTime = valueInt
-    dispatch(updateGames(games))
+    _games[0].gameHalfTime = valueInt
+    dispatch(updateGames(_games))
+
+    const teamIdCodeGames = _games[0].teamIdCode
+    const gameIdDb = _games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: _games[0],
+     })
 
   }
 
   const changeTime = () => {
 
+    let _games = []
+    try {
+      _games = [...games]
+    }
+    catch {
+      _games = [{...games}]
+    }
+
     const valueInt = 0
     setGameTime(valueInt)
-    games[0].gameHalfTime = valueInt
-    dispatch(updateGames(games))
+    _games[0].gameHalfTime = valueInt
+    dispatch(updateGames(_games))
 
   }
 
@@ -51,17 +105,19 @@ const SelectGameTime = (props)=>{
 
   return (
     <Box shadow="7" minW="100%">
-    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
     <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
       How long is each half?
     </Text>
     {gameTime === 0 &&
       <Center>
       <Box maxW="100%">
-        <Select selectedValue={gameTime} minWidth="100%" bg="#fff" accessibilityLabel="Select Game-Time" placeholder="Select Game-Time" _selectedItem={{
+        <Select selectedValue={gameTime} minWidth="100%" bg="#333" accessibilityLabel="Select Game-Time" placeholder="Select Game-Time" _selectedItem={{
         bg: "teal.600",
         endIcon: <CheckIcon size="5" />
       }} mt={1}  onValueChange={addGameTimeSelect.bind(this)} >
+          <Select.Item label="1min (2min total game)" value="1" />
+          <Select.Item label="2min (4min total game)" value="2" />
           <Select.Item label="5min (10min total game)" value="5" />
           <Select.Item label="10min (20min total game)" value="10" />
           <Select.Item label="15min (30min total game)" value="15" />
@@ -113,7 +169,7 @@ const SelectGameTime = (props)=>{
       <Box>
       <HStack>
       <Text style={{paddingTop: 5, color: '#fff'}}>Time for each half: {formattedSeconds(gameTime)}min</Text>
-      <Button size="xs" _text={{fontSize: "xs", textDecorationLine: true}} variant="link" onPress={() => changeTime()}>Change time</Button>
+      <Button size="xs" _text={{fontSize: "xs", textDecorationLine: "underline"}} variant="link" onPress={() => changeTime()}>Change time</Button>
       </HStack>
       </Box>
     }

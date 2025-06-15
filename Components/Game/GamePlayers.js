@@ -62,7 +62,16 @@ const GamePlayers = (props)=>{
       _games = [{...games}]
     }
 
+    const priority = [ "fwd", "mid", "def", "gol", "sub", "abs"];
+    let byPosition = []
 
+    try {
+      byPosition = _games[0].teamPlayers.sort( ( a, b ) => priority.indexOf( a.currentPosition ) - priority.indexOf( b.currentPosition ) );
+    }
+    catch {
+      byPosition = []
+    }
+    /*
     let playerNamesAlphaOrder = []
 
     try {
@@ -81,17 +90,18 @@ const GamePlayers = (props)=>{
     catch {
       playerNamesAlphaOrder = []
     }
+    */
 
-    ////console.log(JSON.stringify(playerNamesAlphaOrder) + ' playerNamesAlphaOrder chefck here.');
+  //console.log(JSON.stringify(playerNamesAlphaOrder) + ' playerNamesAlphaOrder chefck here.');
 
     //const teamPlayers = games[0].teamPlayers
-    setGetTeam(playerNamesAlphaOrder)
+    setGetTeam(byPosition)
 
   },[games[0].teamPlayers])
 
   useEffect(() => {
 
-    //////console.log(gamePlayerBoard + ' hit and check gamePlayerBoard');
+  //console.log(gamePlayerBoard + ' hit and check gamePlayerBoard');
     //setStatsBoardDisplay(statsBoard)
     //setStatsPlayerId(statsBoardPlayerId)
     setIsOpen(gamePlayerBoard)
@@ -106,7 +116,7 @@ const GamePlayers = (props)=>{
   const setOpenStatus = (isOpen, id, playerIndex) => {
 
 
-    //console.log(playerIndex + ' what is playerIndex 2');
+  //console.log(playerIndex + ' what is playerIndex 2');
 
     let playerIndexCount = 0
     getTeam.map(item => {
@@ -127,12 +137,12 @@ const GamePlayers = (props)=>{
 
     const playerIndexInt = Number(playerIndex)
 
-    //console.log(playerIndexCountThreshold + ' playerIndexCountThreshold');
-    //console.log(playerIndex + ' playerIndex');
-    //console.log(playerIndexInt + ' playerIndexInt');
-    //console.log(isOpen + ' isOpen');
+  //console.log(playerIndexCountThreshold + ' playerIndexCountThreshold');
+  //console.log(playerIndex + ' playerIndex');
+  //console.log(playerIndexInt + ' playerIndexInt');
+  //console.log(isOpen + ' isOpen');
     if (isOpen === true && playerIndexCountThreshold <= playerIndexInt) {
-      //console.log('are we hit innit?');
+    //console.log('are we hit innit?');
       const offset = contentVerticalOffset + 100
       scrollRef.current?.scrollTo({x: 0, y: offset, animated: true});
     }
@@ -148,8 +158,8 @@ const GamePlayers = (props)=>{
   }
 
   const _onViewableItemsChanged = React.useCallback(({ viewableItems, changed }) => {
-    //console.log("Visible items are", viewableItems);
-    //console.log("Changed in this iteration, ", changed);
+  //console.log("Visible items are", viewableItems);
+  //console.log("Changed in this iteration, ", changed);
   }, []);
 
   const _viewabilityConfig = {
@@ -170,7 +180,7 @@ const GamePlayers = (props)=>{
             <View>
             {item.currentPosition !== 'abs' && item.delete !== true &&
             <Box mb="3" shadow="7">
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
 
                 <Box pl={["0", "4"]} pr={["0", "5"]} py="2" bg="transparent">
                   <HStack space={[2, 3]} justifyContent="space-between">

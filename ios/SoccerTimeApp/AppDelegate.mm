@@ -1,5 +1,6 @@
 #import "AppDelegate.h"
 #import <Firebase.h>
+#import "RNSplashScreen.h"
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -14,6 +15,9 @@
   self.initialProps = @{};
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+  
+  [RNSplashScreen show];
+  
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

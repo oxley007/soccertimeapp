@@ -28,16 +28,16 @@ const initialState = {
   pauseTimer: false,
 };
 
-//console.log('hitting rootReducer');
-//console.log(initialState);
+console.log('hitting rootReducer');
+console.log(initialState);
 
 //const rootReducer = (state = initialState, action) => {
 export default (state = initialState, action) => {
   switch (action.type) {
     case ADD_STOPWATCH:
-    //console.log(action.secondsElapsed  + ' secondsElapsed');
-    //console.log(action.avgBall  + ' avgBall');
-    //console.log(action.sixtySecondsMark  + ' sixtySecondsMark check hi');
+  //console.log(action.secondsElapsed  + ' secondsElapsed');
+  //console.log(action.avgBall  + ' avgBall');
+  //console.log(action.sixtySecondsMark  + ' sixtySecondsMark check hi');
     return {
       ...state,
       secondsElapsed: action.secondsElapsed,
@@ -83,15 +83,15 @@ const initialState = {
   sixtySecondsMark: 0,
 };
 
-//console.log('hitting rootReducer in stopwatch');
-//console.log(initialState + ' Stopwatch initial state');
+console.log('hitting rootReducer in stopwatch');
+console.log(initialState + ' Stopwatch initial state');
 
 //const rootReducer = (state = initialState, action) => {
 export default (state = initialState, action) => {
   switch (action.type) {
     case ADD_STOPWATCH:
-    //console.log(action.secondsElapsed  + ' secondsElapsed');
-    //console.log(action.laps  + ' laps');
+  //console.log(action.secondsElapsed  + ' secondsElapsed');
+  //console.log(action.laps  + ' laps');
     return {
       ...state,
       secondsElapsed: action.secondsElapsed,

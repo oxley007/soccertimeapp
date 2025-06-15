@@ -5,8 +5,10 @@ import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/AntDesign';
-const plusIcon = <Icon name="plus" size={30} color="#0891b2" />;
-const minusIcon = <Icon name="minus" size={30} color="#0891b2" />;
+const plusIcon = <Icon name="plus" size={30} color="#ffffff" />;
+const minusIcon = <Icon name="minus" size={30} color="#ffffff" />;
+const downIcon = <Icon name="down" size={20} color="#E879F9" />;
+const upIcon = <Icon name="up" size={20} color="#E879F9" />;
 import LinearGradient from 'react-native-linear-gradient';
 
 import { updateGames } from '../../Reducers/games';
@@ -46,10 +48,10 @@ const PreviousGamesHome = (props)=>{
   useEffect(() => {
 
 
-      console.log(seasonsDisplay + ' what is seasonsDisplay');
+   //console.log(seasonsDisplay + ' what is seasonsDisplay');
       const seasonYear = seasonsDisplay
       prevGamesSeason.season = seasonsDisplay
-      console.log(seasonYear + ' what is seasonYear');
+   //console.log(seasonYear + ' what is seasonYear');
 
       const seasonIndex = seasons.findIndex(x => x.season === seasonsDisplay);
       let valueInt = 0
@@ -99,7 +101,7 @@ const PreviousGamesHome = (props)=>{
 
   useEffect(() => {
 
-    console.log('hitting here no?');
+ //console.log('hitting here no?');
       dispatch(updatePrevGames(prevGamesTeam, prevGamesSeason))
 
   },[prevGamesTeam.id, prevGamesSeason.id])
@@ -149,42 +151,55 @@ const PreviousGamesHome = (props)=>{
   //const teamType = props.route.params.teamType
 
         return (
+          <Center>
+          <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradientBg}>
           <Center style={{minWidth: "100%", height: '100%'}}>
             <Container h="100%" w="100%" maxWidth="100%" pt="16" >
-              <Box minW='100%' style={{zIndex: 3, elevation: 3, borderBottomColor: '#ccc', borderBottomWidth: 1}}>
+              <Box minW='100%' style={{zIndex: 3, elevation: 3, borderBottomColor: '#E879F9', borderBottomWidth: 5}}>
                 <HStack>
                   <View style={{paddingRight: '5%', paddingLeft: '5%'}}>
                   <Box shadow="7" mt="10" mb="2">
-                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
 
-                  <Heading style={{color: '#fff', textAlign: 'left', paddingBottom: 10, paddingLeft: 20, paddingTop: 10, paddingRight: 20}}>
+                  <Heading style={{color: '#fff', textAlign: 'left', paddingBottom: 10, paddingTop: 10, paddingRight: 20}}>
                     View Previous Games
                   </Heading>
                   </LinearGradient>
                   </Box>
-                  <Text style={{marginBottom: 10}}>Select your Team and Season to view game events (goals, saves, assists, etc) and player game-times</Text>
-                  <Box bg="tertiary.100" style={{zIndex: 3, elevation: 3, marginBottom: 10}}>
+                  { teamNames.length > 0 &&
+                    <Box>
+                  <Text style={{marginBottom: 10, color: '#fff'}}>Select your Team and Season to view game events (goals, saves, assists, etc) and player game-times</Text>
+                  <Box bg="transparent" style={{zIndex: 3, elevation: 3, marginBottom: 10}}>
 
                   {isOpen === false &&
-                    <Button style={{justifyContent: 'flex-start'}} variant="unstyled" onPress={() => setOpenStatus(true)}>
+                    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
+                    <Button style={{justifyContent: 'flex-start'}} p="0" m="0" variant="unstyled" onPress={() => setOpenStatus(true)}>
                       <HStack>
-                        {isOpen ? minusIcon : plusIcon}
+
                         <Center>
-                          <Text style={{color: '#0891b2', fontSize: 16, textAlign: 'left', paddingLeft: 5}}>SHOW GAMES FILTER</Text>
+                          <Text style={{color: '#fff', fontSize: 20, textAlign: 'left'}}>Change Team</Text>
                           </Center>
+                          <Text style={{textAlign: 'right', minWidth: '55%', textAlign: 'right'}}>
+                            {isOpen ? upIcon : downIcon}
+                          </Text>
                       </HStack>
                     </Button>
+                    </LinearGradient>
                   }
                   {isOpen === true &&
-                    <Button variant="unstyled" onPress={() => setOpenStatus(false)}>
+                    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
+                    <Button style={{justifyContent: 'flex-start', marginTop: 0}} variant="unstyled" onPress={() => setOpenStatus(false)}>
                     <HStack>
-                      {isOpen ? minusIcon : plusIcon}
-                      <Center pl="2">
-                        <Text style={{color: '#0891b2', fontSize: 20}}>HIDE GAMES FILTER</Text>
+
+                      <Center>
+                        <Text style={{color: '#fff', fontSize: 20}}>Hide Games Filter</Text>
                       </Center>
+                      <Text style={{minWidth: '45%', textAlign: 'right'}}>
+                        {isOpen ? upIcon : downIcon}
+                      </Text>
                     </HStack>
                     </Button>
-
+                    </LinearGradient>
                   }
                   {isOpen === true &&
                   <PresenceTransition visible={isOpen} initial={{
@@ -198,18 +213,61 @@ const PreviousGamesHome = (props)=>{
                     style={{zIndex: 3, elevation: 3 }}
                   >
 
+                  <Box shadow="7">
+                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={props.whereFrom === 7 ? styles.linearGradientSeven : styles.linearGradientHideDisplay}>
+                  {seasonId > 0 &&
+                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '600', textAlign: 'left', paddingBottom: 3}}>
+                    Season Selected:
+                  </Text>
+                  }
+                  {seasonId === 0 &&
+                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '600', textAlign: 'left', paddingBottom: 3}}>
+                    Select Season
+                  </Text>
+                  }
+                  {seasonId === 0 &&
+                    <Center>
+                    <Box maxW="100%">
+                      <Select selectedValue={seasonId} minWidth="100%" bg="#333" accessibilityLabel="Select Game-Time" placeholder="Select Season" _selectedItem={{
+                      bg: "teal.600",
+                      endIcon: <CheckIcon size="5" />
+                    }} mt={1}  onValueChange={addSeasonSelect.bind(this)} >
 
+                      {seasons !== "" ? (
+                          seasons.map(item => {
+                            if (item.teamType !== 0) {
+                              return <Select.Item label={item.season} value={item.id} />;
+                            }
+                          })
+                      ) : (
+                          <Picker.Item label="Loading..." value="0" />
+                      )}
+                      </Select>
+                    </Box>
+                    </Center>
+                  }
+                  {seasonId > 0 &&
+                    <Box>
+                    <HStack>
+                    <Text style={{fontSize: 16, paddingTop: 5, color: '#fff'}}>{season}</Text>
+                    <Button size="xs" _text={{fontSize: "xs", textDecorationLine: "underline", color: '#E879F9'}} variant="link" onPress={() => changeSeason()}>Change</Button>
+                    </HStack>
+                    </Box>
+                  }
+
+                  </LinearGradient>
+                  </Box>
 
                   <Box shadow="7">
-                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradientHideDisplay}>
 
-                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
-                    Select Team
+                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '600', textAlign: 'left', paddingBottom: 3}}>
+                    Select Team:
                   </Text>
                   {oppTeamId === 0 &&
                     <Center>
                     <Box maxW="100%">
-                      <Select selectedValue={oppTeamId} minWidth="100%" bg="#fff" accessibilityLabel="Select Game-Time" placeholder="Select Game-Time" _selectedItem={{
+                      <Select selectedValue={oppTeamId} minWidth="100%" bg="#333" accessibilityLabel="Select Game-Time" placeholder="Select Game-Time" _selectedItem={{
                       bg: "teal.600",
                       endIcon: <CheckIcon size="5" />
                     }} mt={1}  onValueChange={addGameTimeSelect.bind(this)} >
@@ -230,75 +288,39 @@ const PreviousGamesHome = (props)=>{
                   {oppTeamId > 0 &&
                     <Box>
                     <HStack>
-                    <Text style={{paddingTop: 5, color: '#fff'}}>{oppTeam}</Text>
-                    <Button size="xs" _text={{fontSize: "xs", textDecorationLine: true}} variant="link" onPress={() => changeTime()}>Change time</Button>
+                    <Text style={{paddingTop: 5, color: '#fff', fontSize: 16}}>{oppTeam}</Text>
+                    <Button size="xs" _text={{fontSize: "xs", textDecorationLine: "underline", color: '#E879F9'}} variant="link" onPress={() => changeTime()}>Change</Button>
                     </HStack>
                     </Box>
                   }
 
                   </LinearGradient>
                   </Box>
-                  <Box shadow="7">
-                  <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={props.whereFrom === 7 ? styles.linearGradientSeven : styles.linearGradient}>
-                  {seasonId > 0 &&
-                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
-                    Season Selected:
-                  </Text>
-                  }
-                  {seasonId === 0 &&
-                  <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
-                    Select Season
-                  </Text>
-                  }
-                  {seasonId === 0 &&
-                    <Center>
-                    <Box maxW="100%">
-                      <Select selectedValue={seasonId} minWidth="100%" bg="#fff" accessibilityLabel="Select Game-Time" placeholder="Select Season" _selectedItem={{
-                      bg: "teal.600",
-                      endIcon: <CheckIcon size="5" />
-                    }} mt={1}  onValueChange={addSeasonSelect.bind(this)} >
-                      <Select.Item label="+Add new season" value="new" />
-                      {seasons !== "" ? (
-                          seasons.map(item => {
-                            if (item.teamType !== 0) {
-                              return <Select.Item label={item.season} value={item.id} />;
-                            }
-                          })
-                      ) : (
-                          <Picker.Item label="Loading..." value="0" />
-                      )}
-                      </Select>
-                    </Box>
-                    </Center>
-                  }
-                  {seasonId > 0 &&
-                    <Box>
-                    <HStack>
-                    <Text style={{fontSize: 20, paddingTop: 5, color: '#fff', fontWeight: '700'}}>{season}</Text>
-                    <Button size="xs" _text={{fontSize: "xs", textDecorationLine: true}} variant="link" onPress={() => changeSeason()}>Change Season</Button>
-                    </HStack>
-                    </Box>
-                  }
 
-                  </LinearGradient>
-                  </Box>
                   </PresenceTransition>
                 }
                   </Box>
-
+                  </Box>
+                }
+                { teamNames.length <= 0 &&
+                  <Text style={{marginBottom: 10, color: '#fff' }}>PLESE READ: You must add a team before you can view team stats. Tap 'Home' and then 'New Game' to add a team.</Text>
+                }
                   </View>
                 </HStack>
               </Box>
               <ScrollView>
-              <DisplayPrevGames navigation={props.navigation} teamId={getPrevGames}/>
+              <DisplayPrevGames navigation={props.navigation} teamId={getPrevGames} whereFrom={55}/>
               </ScrollView>
             </Container>
             <Box minW="100%" safeAreaTop alignSelf="center" mt="5" mb="10" style={{paddingTop: 0, paddingBottom: 50, paddingLeft: 20, paddingRight: 20}}>
               <HStack alignItems="center" safeAreaBottom p="0"  shadow={6} >
-                <Button minW="100%" bg="tertiary.400" size="md" _text={{fontSize: "xl"}} variant="subtle" onPress={() => continueSetup()}>Home</Button>
+                <Button minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Home</Button>
               </HStack>
             </Box>
           </Center>
+          </LinearGradient>
+          </Center>
+
         )
     }
 
@@ -315,6 +337,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     minWidth: '100%',
     marginTop: 10
+  },
+  linearGradientHideDisplay: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 10,
+    paddingBottom: 15,
+    minWidth: '100%',
+  },
+  linearGradientBg: {
+    minWidth: '100%',
   },
 })
 

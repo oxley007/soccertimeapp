@@ -41,22 +41,22 @@ const GameTimeSubTime = (props)=>{
 
   useEffect(() => {
     try {
-      console.log(JSON.stringify(playerData.postionTimes.fwd) + ' playerData firsy fws check.');
+   //console.log(JSON.stringify(playerData.postionTimes.fwd) + ' playerData firsy fws check.');
       playerData.postionTimes.fwd.map(fwd => {
         const totalTime = getPositionTimes(fwd)
         fwdTimeArray.push({totalTime})
       })
     }
     catch {
-      console.log('this is a hit playerData firsy fws check');
+   //console.log('this is a hit playerData firsy fws check');
       const totalTime = 0
       fwdTimeArray.push({totalTime})
     }
 
     try {
-      console.log(JSON.stringify(playerData.postionTimes.mid) + ' firsy mid check new.');
+   //console.log(JSON.stringify(playerData.postionTimes.mid) + ' firsy mid check new.');
       playerData.postionTimes.mid.map(mid => {
-        console.log(mid + ' mid check.');
+     //console.log(mid + ' mid check.');
         const totalTime = getPositionTimes(mid)
         midTimeArray.push({totalTime})
       })
@@ -67,9 +67,9 @@ const GameTimeSubTime = (props)=>{
     }
 
     try {
-      console.log(JSON.stringify(playerData.postionTimes.def) + ' firsy def check new.');
+   //console.log(JSON.stringify(playerData.postionTimes.def) + ' firsy def check new.');
       playerData.postionTimes.def.map(def => {
-        console.log(def + ' mid check.');
+     //console.log(def + ' mid check.');
         const totalTime = getPositionTimes(def)
         defTimeArray.push({totalTime})
       })
@@ -80,9 +80,9 @@ const GameTimeSubTime = (props)=>{
     }
 
     try {
-      console.log(JSON.stringify(playerData.postionTimes.gol) + ' firsy gol check new.');
+   //console.log(JSON.stringify(playerData.postionTimes.gol) + ' firsy gol check new.');
       playerData.postionTimes.gol.map(gol => {
-        console.log(gol + ' gol check.');
+     //console.log(gol + ' gol check.');
         const totalTime = getPositionTimes(gol)
         golTimeArray.push({totalTime})
       })
@@ -93,9 +93,9 @@ const GameTimeSubTime = (props)=>{
     }
 
     try {
-      console.log(JSON.stringify(playerData.postionTimes.sub) + ' firsy sub check new.');
+   //console.log(JSON.stringify(playerData.postionTimes.sub) + ' firsy sub check new.');
       playerData.postionTimes.sub.map(sub => {
-        console.log(sub + ' sub check.');
+     //console.log(sub + ' sub check.');
         const totalTime = getPositionTimes(sub)
         subTimeArray.push({totalTime})
       })
@@ -128,15 +128,15 @@ const GameTimeSubTime = (props)=>{
       timeArrayFour
     ]
     const allTimes = allArrays.flat(1);
-    console.log(JSON.stringify(allTimes)  + ' JSON.stringify(allTimes) check.');
+ //console.log(JSON.stringify(allTimes)  + ' JSON.stringify(allTimes) check.');
     const posTotalTime = allTimes.reduce((a,v) =>  a = a + v.totalTime , 0 )
     return posTotalTime
   }
 
   const getPositionTimes = (pos) => {
 
-    console.log(pos.st + ' checking fwd.st');
-    console.log(pos.fin + ' checking fwd.fin');
+ //console.log(pos.st + ' checking fwd.st');
+ //console.log(pos.fin + ' checking fwd.fin');
   try {
     startTime = pos.st
     endTime = pos.fin
@@ -148,7 +148,7 @@ const GameTimeSubTime = (props)=>{
 
 
   if (endTime === 99999999) {
-    console.log(sixtySecondsMark + ' check sixtySecondsMark');
+ //console.log(sixtySecondsMark + ' check sixtySecondsMark');
     //endTime = sixtySecondsMark
     endTime = secondsElapsed
   }

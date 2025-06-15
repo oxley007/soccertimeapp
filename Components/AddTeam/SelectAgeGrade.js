@@ -7,6 +7,7 @@ import auth from '@react-native-firebase/auth';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { updateGames } from '../../Reducers/games';
+import { updateTeamNames } from '../../Reducers/teamNames';
 //import { updateSeasons } from '../../Reducers/grades';
 
 const formattedSeconds = (sec) =>
@@ -20,6 +21,7 @@ const SelectAgeGrade = (props)=>{
   const [gradeId, setGradeId] = useState('');
 
   let games = useSelector(state => state.games.games);
+  let teamNames = useSelector(state => state.teamNames.teamNames);
   //let grades = useSelector(state => state.grades.grades);
   //let gradesDisplay = useSelector(state => state.grades.gradesDisplay);
 
@@ -39,7 +41,7 @@ const SelectAgeGrade = (props)=>{
       //const gradeIndex = grades.findIndex(x => x.id === valueInt);
       //const gradeName = grades[gradeIndex].grade
 
-      //console.log(value + ' does value work?');
+    //console.log(value + ' does value work?');
       let gradeShortStr = ''
       if (value === 'Senior (18+)') {
         gradeShortStr = 'over18'
@@ -52,6 +54,41 @@ const SelectAgeGrade = (props)=>{
       setGrade(value)
       setGradeId(gradeShortStr)
       dispatch(updateGames(games))
+
+      const teamIdCodeGames = games[0].teamIdCode
+      const gameIdDb = games[0].gameIdDb
+
+   //console.log(gradeShortStr + ' gradeShortStr');
+   //console.log(props.whereFrom + ' props.whereFrom is??');
+
+      if (props.whereFrom === "editTeam") {
+
+        const teamIndex = teamNames.findIndex(x => x.id === props.teamData.id);
+        const teamId = props.teamData.teamId
+
+        teamNames[teamIndex].grade = gradeShortStr
+
+        dispatch(updateTeamNames(teamNames))
+
+        userRef.doc("teamNames").update({
+            teamNames: teamNames,
+          })
+          .catch(error => this.setState({ errorMessage: error.message }))
+
+        //console.log('hitting test add?');
+          //const teamName = 'teamTest3'
+          //const teamId = 'AO123'
+          firestore().collection(teamId).doc(teamId).update({
+             grade: gradeShortStr
+           })
+
+      }
+
+      /*
+      firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+         game: games[0],
+       })
+       */
       //dispatch(updateSeasons(grades, gradeName))
 
   }
@@ -64,6 +101,13 @@ const SelectAgeGrade = (props)=>{
     setGrade(valueInt)
     setGradeId('')
     dispatch(updateGames(games))
+
+    const teamIdCodeGames = games[0].teamIdCode
+    const gameIdDb = games[0].gameIdDb
+
+    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+       game: games[0],
+     })
     //dispatch(updateSeasons(grades, ''))
   }
 
@@ -72,10 +116,9 @@ const SelectAgeGrade = (props)=>{
   return (
     <Box>
 
-
       <Center>
       <Box maxW="100%">
-        <Select selectedValue={grade} minWidth="100%" bg="#fff" accessibilityLabel="Select Age Grade" placeholder="Select Age Grade" _selectedItem={{
+        <Select selectedValue={grade} minWidth="100%" style={{color: '#fff'}} bg="#333" accessibilityLabel="Select Age Grade" placeholder="Select Age Grade" _selectedItem={{
         bg: "teal.600",
         endIcon: <CheckIcon size="5" />
       }} mt={1}  onValueChange={addGradeSelect.bind(this)} >

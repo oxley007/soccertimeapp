@@ -66,7 +66,7 @@ const InputSeason = (props)=>{
     catch {
       _seasons = [{...seasons}];
     }
-    //console.log(_seasons + ' fromo props 2 seasons');
+  //console.log(_seasons + ' fromo props 2 seasons');
 
     //let seasonsLength = _seasons.length
     let seasonsLength  = 0
@@ -79,14 +79,14 @@ const InputSeason = (props)=>{
 
     let teamType = 0
     try {
-      //console.log(props.teamType + ' props.teamType here');
+    //console.log(props.teamType + ' props.teamType here');
     teamType = props.teamType
   }
   catch {
     teamType = 0
   }
 
-    //console.log(seasonsLength + ' seasonsLength');
+  //console.log(seasonsLength + ' seasonsLength');
 
     let seasonsArray = []
 
@@ -97,48 +97,72 @@ const InputSeason = (props)=>{
       seasonsArray = []
     }
 
-    //console.log(JSON.stringify(seasonsArray) + ' need to check seasonsArray');
+  //console.log(JSON.stringify(seasonsArray) + ' need to check seasonsArray');
 
     inputs.map(input => {
       if (input.value === '') {
-        //console.log('value is null');
+      //console.log('value is null');
       }
       else {
 
-
+        const teamIdCodeGames = games[0].teamIdCode
         seasonsLength++
         //seasonsArray.push({id: seasonsLength, teamId: teamId, teamName: input.value, teamType: teamType, teamSelected: false});
-        seasonsArray.unshift({id: seasonsLength, season: input.value});
+        seasonsArray.unshift({id: seasonsLength, season: input.value, teamIdCode: teamIdCodeGames});
         const seasonsDisplay = input.value
         const seasonsDisplayId = seasonsLength
         games[0].season.season = input.value
         games[0].season.id = seasonsLength
 
-        //console.log(seasonsArray + ' seasonsArray end.');
+      //console.log(seasonsArray + ' seasonsArray end.');
 
         _seasons = seasonsArray;
 
-        dispatch(updateSeasons(_seasons, seasonsDisplay, seasonsDisplayId))
+
         dispatch(updateGames(games))
 
-        ////console.log(JSON.stringify(userRef) + ' check userRef');
 
-        //_seasons = JSON.stringify(_seasons, getCircularReplacer());
+        const gameIdDb = games[0].gameIdDb
 
-        userRef.doc("seasons").update({
-            seasons: _seasons,
-          })
-          .catch(error => this.setState({ errorMessage: error.message }))
+
+          firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+             game: games[0],
+           })
+
+
+         dispatch(updateSeasons(_seasons, seasonsDisplay, seasonsDisplayId))
+
+
+          userRef.doc("seasons").set({
+              seasons: _seasons,
+            })
+            .catch(error => this.setState({ errorMessage: error.message }))
+
+
+
+            firestore().collection(teamIdCodeGames).doc('seasons').set({
+               seasons: _seasons,
+             })
+
 
 
     setInputs([{key: '', value: ''}]);
   }
 })
 
-  navigate('SetupHome',
-{
-  whereFrom: 2
-});
+ //console.log(props.whereFrom + ' just qck check props.whereFrom');
+
+
+    navigate('AddPlayersHome',
+  {
+    whereFrom: 2,
+    addTeamOnly: props.addTeamOnly,
+    teamIdCode: games[0].teamIdCode,
+    teamId: games[0].teamId,
+  });
+
+
+
 
 }
 
@@ -156,13 +180,13 @@ const InputSeason = (props)=>{
 
         return (
           <Box minW="100%" shadow="7">
-            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradient}>
 
               <Text style={{fontSize: 20, color: '#fff', fontWeight: '400'}}>
                 Add New Season
               </Text>
               <Text style={{fontSize: 14, color: '#ddd', fontWeight: '400'}}>
-                Enter the season year - i.e. 2023 or 2023/24
+                Enter the season year - i.e. 2025 or 2024/25
               </Text>
 
               <Box width="100%">
@@ -189,6 +213,26 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     borderRadius: 5
   },
+  textInputName: {
+    color: '#333',
+    ...Platform.select({
+      ios: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      },
+      android: {
+        padding: 0,
+      },
+      default: {
+        flex: 1,
+        maxHeight: 14,
+        lineHeight: 14,
+        minHeight: 14,
+      }
+      })
+  }
 })
 
 export default InputSeason;

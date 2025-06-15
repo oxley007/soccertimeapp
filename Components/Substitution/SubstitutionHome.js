@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Component, useRef } from 'react'
-import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio, Platform } from 'react-native'
 import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, HStack, VStack, PresenceTransition } from 'native-base';
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
@@ -70,20 +70,22 @@ const SubstitutionHome = (props)=>{
 
   const continueSetup = () => {
 
-    ////console.log(JSON.stringify(getTeamPositions) + ' JSON.stringify(getTeamPositions)');
-    ////console.log(getTeamPositions[0].currentPosition + ' getTeamPositions[0].currentPosition');
+  //console.log(JSON.stringify(getTeamPositions) + ' JSON.stringify(getTeamPositions)');
+  //console.log(getTeamPositions[0].currentPosition + ' getTeamPositions[0].currentPosition');
 
     let naCount = 0
 
     games[0].teamPlayers.map(player => {
 
-      //console.log(JSON.stringify(player) + ' check player before functions.');
+    //console.log(JSON.stringify(player) + ' check player before functions.');
+      //console.log('checking savePositionTime ok 5');
+      //Alert.alert("checking savePositionTime ok 5" )
       const positionTimesSave = PositionTimes.savePositionTime(player, secondsElapsed);
       const positionTimesSaveFirst = positionTimesSave[0];
 
-      //console.log(JSON.stringify(positionTimesSaveFirst) + ' positionTimesSaveFirst');
+    //console.log(JSON.stringify(positionTimesSaveFirst) + ' positionTimesSaveFirst');
       player = positionTimesSaveFirst
-      //console.log(JSON.stringify(player) + ' now check player after update.');
+    //console.log(JSON.stringify(player) + ' now check player after update.');
 
       /*
       try {
@@ -139,14 +141,14 @@ const SubstitutionHome = (props)=>{
       */
 
 
-      ////console.log(JSON.stringify(teamPositionsIndex) + ' what is teamPositionsIndex');
+    //console.log(JSON.stringify(teamPositionsIndex) + ' what is teamPositionsIndex');
 
       //if (teamPositionsIndex !== -1 ) {
-        ////console.log(getTeamPositions[teamPositionsIndex] + ' what is getTeamPositions[teamPositionsIndex]');
-        ////console.log(getTeamPositions[teamPositionsIndex].currentPosition + ' what is getTeamPositions[teamPositionsIndex].currentPosition');
+      //console.log(getTeamPositions[teamPositionsIndex] + ' what is getTeamPositions[teamPositionsIndex]');
+      //console.log(getTeamPositions[teamPositionsIndex].currentPosition + ' what is getTeamPositions[teamPositionsIndex].currentPosition');
       //if (player.currentPosition !== getTeamPositions[teamPositionsIndex].currentPosition) {
 
-      const positionTimesGet = PositionTimes.getPositionTime(player, secondsElapsed, naCount);
+      const positionTimesGet = PositionTimes.getPositionTime(player, secondsElapsed, games[0].gameHalfTime, games[0].halfTime);
       const positionTimesGetSecond = positionTimesGet[0];
       naCount = positionTimesGet[1];
 
@@ -157,8 +159,8 @@ const SubstitutionHome = (props)=>{
             naCount = naCount + 1
           }
           else if (player.currentPosition === 'fwd') {
-            //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
-            //console.log(JSON.stringify(player.postionTimes.fwd) + ' what is player.postionTimes[0].fwd');
+          //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
+          //console.log(JSON.stringify(player.postionTimes.fwd) + ' what is player.postionTimes[0].fwd');
             try {
               try {
                 const positionFwdTimeIndex = player.postionTimes.fwd.findIndex(x => x.fin === 99999999);
@@ -177,8 +179,8 @@ const SubstitutionHome = (props)=>{
             }
           }
           else if (player.currentPosition === 'mid') {
-            //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
-            //console.log(JSON.stringify(player.postionTimes.mid) + ' what is player.postionTimes[0].mid');
+          //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
+          //console.log(JSON.stringify(player.postionTimes.mid) + ' what is player.postionTimes[0].mid');
             try {
               try {
                 const positionMidTimeIndex = player.postionTimes.mid.findIndex(x => x.fin === 99999999);
@@ -196,8 +198,8 @@ const SubstitutionHome = (props)=>{
             }
           }
           else if (player.currentPosition === 'def') {
-            //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
-            //console.log(JSON.stringify(player.postionTimes.def) + ' what is player.postionTimes[0].def');
+          //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
+          //console.log(JSON.stringify(player.postionTimes.def) + ' what is player.postionTimes[0].def');
             try {
               try {
               const positionDefTimeIndex = player.postionTimes.def.findIndex(x => x.fin === 99999999);
@@ -215,8 +217,8 @@ const SubstitutionHome = (props)=>{
             }
           }
           else if (player.currentPosition === 'gol') {
-            //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
-            //console.log(JSON.stringify(player.postionTimes.gol) + ' what is player.postionTimes[0].gol');
+          //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
+          //console.log(JSON.stringify(player.postionTimes.gol) + ' what is player.postionTimes[0].gol');
             try {
               try {
                 const positionGolTimeIndex = player.postionTimes.gol.findIndex(x => x.fin === 99999999);
@@ -235,8 +237,8 @@ const SubstitutionHome = (props)=>{
             }
           }
           else if (player.currentPosition === 'sub') {
-            //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
-            //console.log(JSON.stringify(player.postionTimes.sub) + ' what is player.postionTimes[0].sub');
+          //console.log(JSON.stringify(player.postionTimes) + ' what is player.postionTimes[0]');
+          //console.log(JSON.stringify(player.postionTimes.sub) + ' what is player.postionTimes[0].sub');
             try {
               try {
                 const positionSubTimeIndex = player.postionTimes.sub.findIndex(x => x.fin === 99999999);
@@ -271,9 +273,16 @@ const SubstitutionHome = (props)=>{
         games[0].halfTime = 2
       }
 
-      //console.log(JSON.stringify(games) + ' just need to check evenrything here before i save.');
-      //console.log(JSON.stringify(games[0].teamPlayers) + ' games[0].teamPlayers just need to check evenrything here before i save.');
+    //console.log(JSON.stringify(games) + ' just need to check evenrything here before i save.');
+    //console.log(JSON.stringify(games[0].teamPlayers) + ' games[0].teamPlayers just need to check evenrything here before i save.');
       dispatch(updateGames(games))
+
+      const teamIdCodeGames = games[0].teamIdCode
+      const gameIdDb = games[0].gameIdDb
+
+      firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+         game: games[0],
+       })
 
       navigate('GameHome', {
         teamId: games[0].teamId,
@@ -359,7 +368,7 @@ const SubstitutionHome = (props)=>{
             <View style={{paddingRight: '5%', paddingLeft: '5%'}}>
             {whereFrom === 'HT' &&
               <Box mt="1">
-                <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#a855f7', '#e879f9']} style={styles.linearGradient}>
+                <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={styles.linearGradient}>
                   <Heading mb="2" mt="2" style={{color: '#fff'}}>Half-Time Overview</Heading>
                   </LinearGradient>
                   <HStack>
@@ -393,12 +402,20 @@ const SubstitutionHome = (props)=>{
                   </HStack>
               </Box>
             }
-              <Heading mb="2" mt="2">
-                Make Substitutions Below
+
+              <View style={{borderBottomColor: '#000', borderBottomWidth: 2, shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 2,
+              elevation: 5}} />
+              <Heading mb="0" mt="2" style={styles.textHeading}>
+                Current Players
               </Heading>
+              <Text style={styles.textTwelve}>Ordered by current position (FWD, MID, DEF, GOL, SUB)</Text>
+
               <Box style={{borderBottomColor: '#aaa', borderBottomWidth: 3, marginBottom: 3}}>
               </Box>
-              <SelectPlayerList teamId={games[0].teamId} whereFrom={1} navigation={props.navigation}/>
+              <SelectPlayerList teamId={games[0].teamId} whereFrom={1} navigation={props.navigation} teamIdCode={games[0].teamIdCode} />
 
 
           <Box minW="100%" minH="23%" safeAreaTop alignSelf="center" style={{paddingTop: 0, borderTopColor: '#aaa', borderTopWidth: 3, marginTop: 3}}>
@@ -432,6 +449,48 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
+  textHeading: {
+    lineHeight: 0,
+    ...Platform.select({
+      ios: {
+        lineHeight: 0,
+      },
+      android: {
+        lineHeight: 20,
+      },
+      default: {
+        lineHeight: 0,
+      }
+      })
+  },
+  textTwelve: {
+    fontSize: 12,
+    marginBottom: 5,
+    ...Platform.select({
+      ios: {
+        lineHeight: 0,
+      },
+      android: {
+        lineHeight: 12,
+      },
+      default: {
+        lineHeight: 0,
+      }
+      })
+  },
 })
 
 export default SubstitutionHome;
+
+/*
+<Heading mb="2" mt="2" >
+  Current Substitutes:
+</Heading>
+<View style={{borderBottomColor: '#000', borderBottomWidth: 2, shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.8,
+  shadowRadius: 2,
+  elevation: 5}} />
+  <SelectPlayerList teamId={games[0].teamId} whereFrom={11} navigation={props.navigation}/>
+
+  */

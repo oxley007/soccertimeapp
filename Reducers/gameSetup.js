@@ -21,7 +21,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_GAMESETUP:
-    //console.log(action.gameSetup);
+  //console.log(action.gameSetup);
       return {
         ...state,
         gameSetup: action.gameSetup,

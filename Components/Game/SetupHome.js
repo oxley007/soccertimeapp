@@ -30,8 +30,8 @@ const SetupHome = (props)=>{
 
   const continueSetup = () => {
 
-    console.log(games[0].gameHalfTime + ' games[0].gameHalfTime');
-    console.log(games[0].teamNames.awayTeamName + ' games[0].teamNames.awayTeamName');
+ //console.log(games[0].gameHalfTime + ' games[0].gameHalfTime');
+ //console.log(games[0].teamNames.awayTeamName + ' games[0].teamNames.awayTeamName');
 
     if (games[0].gameHalfTime > 0 && games[0].teamNames.awayTeamName !== '') {
 

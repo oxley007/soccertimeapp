@@ -23,7 +23,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_PREVGAMES:
-    //console.log(action.seasons);
+  //console.log(action.seasons);
       return {
         ...state,
         team: action.team,

@@ -24,14 +24,14 @@ const FormationBoard = (props)=>{
 
     let checkPlayersFlag = false
     games[0].teamPlayers.map(player => {
-      //console.log(player.currentPosition + ' cehck each player.currentPosition.');
+    //console.log(player.currentPosition + ' cehck each player.currentPosition.');
       if (player.currentPosition !== 'NA' || player.currentPosition === undefined) {
-        //console.log('getting hit why?');
+      //console.log('getting hit why?');
         checkPlayersFlag = true
       }
     })
 
-    //console.log(checkPlayersFlag + ' check checkPlayersFlag bfore condition.');
+  //console.log(checkPlayersFlag + ' check checkPlayersFlag bfore condition.');
 
     if (checkPlayersFlag === false) {
       return (

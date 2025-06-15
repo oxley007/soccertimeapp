@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "164057827422",
+    "project_id": "soccer-time-app",
+    "storage_bucket": "soccer-time-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164057827422:android:6f1c7d3b7b3e826b0ecccf",
+        "android_client_info": {
+          "package_name": "com.soccertimeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164057827422-uiumug6vngkdo9vgh386u586r5hn7ase.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUJwiNOTCsopdVw97j-kkIJ6pZ-2VWjq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164057827422-uiumug6vngkdo9vgh386u586r5hn7ase.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "164057827422-sctsnig9ppdd9o51usna6ja18r7sabc2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.4dot6.soccertimeapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
