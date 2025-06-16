@@ -2556,6 +2556,7 @@ const Home = (props)=>{
   </Box>
   }
               <Text style={{color: 'transparent', fontSize: 0, lineHeight: 0}} >{getHalfTimeFlag}</Text>
+
             </ScrollView>
           </Container>
         </LinearGradient>
@@ -2741,4 +2742,9 @@ delete test Users
     </Text>
   </Center>
 </Button>
+*/
+
+/*
+import * as Sentry from '@sentry/react-native';
+<Button title='Try!' onPress={ () => { Sentry.captureException(new Error('First error')) }}/>
 */
