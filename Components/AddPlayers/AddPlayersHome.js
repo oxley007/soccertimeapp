@@ -841,6 +841,13 @@ const AddPlayersHome = (props)=>{
             </HStack>
           }
 
+          {addTeamOnly !== 1 &&
+            <HStack alignItems="center" safeAreaBottom ml="5" mr="5" mt="3" pb="1" shadow={6} >
+              <Button minW="30%" maxW="20%" bg="#ff0000" size="md" mr="5" _text={{fontSize: 16, color: '#fff'}} variant="subtle" onPress={() => exitSetup()}>Exit</Button>
+              <Button minW="59%" bg="#E879F9" size="md" _text={{fontSize: 16, color: '#fff'}} variant="subtle" onPress={() => continueSetup(1)}>Continue to Season Positions</Button>
+            </HStack>
+          }
+
           {addTeamOnly === 1 &&
             <Box alignItems="center" mt="3" shadow="6">
             <ImageBackground source={require(`../../assets/LIVE_GAME_BUTTON_LEFT_2.png`)} style={styles.backgroundImageLive}>

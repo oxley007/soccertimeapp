@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 //import { updateGames, updateTeamPlayers } from '../redux/actions'; // adjust path if needed
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import { updateGames } from '../../Reducers/games';
 import { updateTeamPlayers } from '../../Reducers/teamPlayers';
@@ -14,10 +16,18 @@ const positionLabels = {
 };
 
 const TeamPlayersPositions = ({ games }) => {
+
   const dispatch = useDispatch();
+  const currentUser = auth().currentUser;
+
+  if (!currentUser) {
+    return <Text>Loading user info...</Text>;
+  }
+
+  const userRef = firestore().collection(currentUser.uid);
   const teamPlayers = games[0]?.teamPlayers || [];
 
-  const handleTogglePosition = (playerIndex, posKey) => {
+  const handleTogglePosition = async (playerIndex, posKey) => {
     const updatedGames = [...games];
     const updatedTeamPlayers = [...teamPlayers];
 
@@ -40,6 +50,23 @@ const TeamPlayersPositions = ({ games }) => {
     // Dispatch to Redux
     dispatch(updateTeamPlayers(updatedTeamPlayers));
     dispatch(updateGames(updatedGames));
+
+    if (!player.playerId) {
+      console.warn('playerId missing for player at index', playerIndex);
+      return;
+    }
+
+    try {
+      await userRef.doc(player.playerId).set(
+        {
+          playerPositions: player.playerPositions,
+        },
+        { merge: true } // <-- this merges the update with existing data, not overwrite whole doc
+      );
+    } catch (error) {
+      console.error('Error updating playerPositions in Firestore:', error.message);
+    }
+
   };
 
   return (
@@ -53,7 +80,9 @@ const TeamPlayersPositions = ({ games }) => {
             {Object.entries(positionLabels).map(([key, label]) => (
               <TouchableOpacity
                 key={key}
-                onPress={() => handleTogglePosition(index, key)}
+                onPress={() => {
+                  handleTogglePosition(index, key).catch(console.error);
+                }}
                 style={[
                   styles.positionButton,
                   item.playerPositions?.[key] && styles.activeButton,
@@ -81,6 +110,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ddd',
+    backgroundColor: '#222'
   },
   playerName: {
     fontSize: 16,
@@ -91,7 +121,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   positionButton: {
     paddingVertical: 6,
@@ -106,7 +135,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 14,
-    color: '#333',
+    color: '#888',
   },
   activeButtonText: {
     color: '#fff',

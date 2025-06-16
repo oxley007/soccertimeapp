@@ -50,18 +50,52 @@ const AddAiTeamPlayersPositionHome = (props)=>{
 
   const { navigate } = props.navigation;
 
+  const continueSetup = () => {
+
+    navigate('SetupHome', {
+      fromContinue: 0
+    });
+
+  }
+
+  const backSetup = () => {
+
+    navigate('AddPlayersHome', {
+      teamId: games[0].teamId,
+      teamIdCode: games[0].teamIdCode,
+      whereFrom: 7,
+      checkSortLive: 0,
+      showNewScreen: false
+    });
+
+  }
+
     return (
+
       <Center>
         <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#000', '#000']} style={styles.linearGradientBg}>
+
           <Box>
-            <Heading mt="5" style={{color: '#fff'}}>Add AI Season Positions</Heading>
+            <Heading mt="5" style={{color: '#fff'}}>Add Season Positions</Heading>
             <Text style={{color: '#ccc', marginBottom: 2}}>Update the positions your players will play during the season so our AI understands their roles during the game. This allows for smarter suggestions on positions and substitutions.</Text>
             <Text style={{color: '#ccc', marginBottom: 2}}>If all team members play every position, you can leave the below selection as default.</Text>
           </Box>
-          <View style={{ height: 1, backgroundColor: '#ccc', marginVertical: 12 }} />
+          <View style={{ height: 2, backgroundColor: '#ccc', marginVertical: 12 }} />
           <TeamPlayersPositions games={games} />
+          <View style={{ height: 2, backgroundColor: '#ccc', marginVertical: 12 }} />
+          <Box maxW="100%" minW="90%" mb="5" safeAreaTop alignSelf="center" style={{paddingTop: 0, paddingBottom: 20}}>
+            <HStack alignItems="center" safeAreaBottom ml="5" mr="5" mt="3" mb='0' pb="0" shadow={6} >
+
+              <Button maxW="100%" minW="90%" bg="#E879F9" size="md" mb="0" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Continue</Button>
+            </HStack>
+            <Button bg="transparent" size="sm" _text={{fontSize: "sm", color: '#fff'}} p="0" m="0" variant="subtle" onPress={() => backSetup()}>Back</Button>
+          </Box>
+
         </LinearGradient>
+
+
       </Center>
+
     )
 
   }

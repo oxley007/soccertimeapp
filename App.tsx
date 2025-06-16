@@ -21,6 +21,8 @@ import {
       DrawerItems
 } from '@react-navigation/drawer'
 import Purchases from 'react-native-purchases';
+import { ApolloProvider } from '@apollo/client';
+import { client } from './Util/apolloClient'; // your Apollo client setup
 
 
 import { NavigationContainer, DrawerActions } from '@react-navigation/native';
@@ -99,28 +101,34 @@ import SelectPlayerTimeDesc from './Components/SelectPlayers/SelectPlayerTimeDes
 import SupportPage from './Components/App/SupportPage.js';
 import SelectSubTimeDesc from './Components/SelectPlayers/SelectSubTimeDesc.js';
 import AddAiTeamPlayersPositionHome from './Components/AddAiPositions/AddAiTeamPlayersPositionHome.js';
+import AppolloHooksTest from './Components/GraphQLTest/AppolloHooksTest.tsx';
+
 
 
 
 //import MenuHidden from './MenuHidden';
 import * as Sentry from '@sentry/react-native';
 
-if (!__DEV__) {
+const commonConfig = {
+  dsn: 'https://your-dsn@sentry.io/project-id',
+  sendDefaultPii: true,
+  integrations: [Sentry.feedbackIntegration()], // remove heavy mobileReplayIntegration in dev
+};
+
+if (__DEV__) {
   Sentry.init({
-    dsn: 'https://your-dsn@sentry.io/project-id',
-    sendDefaultPii: true,
-    integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1,
-    // Don't enable debug in production
+    ...commonConfig,
+    // Disable debug logs to reduce console spam and overhead
+    debug: false,
+    // Disable session replay in dev (heavy)
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
   });
 } else {
   Sentry.init({
-    dsn: 'https://your-dsn@sentry.io/project-id',
-    debug: true, // ✅ Logs to console while developing
-    sendDefaultPii: true,
+    ...commonConfig,
     integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
-    replaysSessionSampleRate: 0.1,
+    replaysSessionSampleRate: 0.1,  // production replay sampling
     replaysOnErrorSampleRate: 1,
   });
 }
@@ -158,91 +166,94 @@ export default Sentry.wrap(function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Loading" contentComponent={CustomDrawerComponent} drawerStyle={{
-        backgroundColor: '#333',
-        color: '#fff',
-        textColor: '#fff'
-      }}
-      drawerContentOptions={{activeTintColor:'#fff', inactiveTintColor:'#fff', itemsContainerStyle: {
-    marginTop: 50,
-  }, labelStyle: {
+    <ApolloProvider client={client}>
+      <NavigationContainer>
+        <Drawer.Navigator initialRouteName="Loading" contentComponent={CustomDrawerComponent} drawerStyle={{
+          backgroundColor: '#333',
+          color: '#fff',
+          textColor: '#fff'
+        }}
+        drawerContentOptions={{activeTintColor:'#fff', inactiveTintColor:'#fff', itemsContainerStyle: {
+          marginTop: 50,
+        }, labelStyle: {
 
-    },
-    itemStyle: {
+          },
+          itemStyle: {
 
-      }}}
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#000',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-  >
-        <Drawer.Screen name="Home" component={Home} options={{ drawerLabel: 'Home', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="KnightMoves" component={KnightMoves} options={{ drawerLabel: 'KnightMoves', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}}} />
-        <Drawer.Screen name="SelectPlayersDragDrop" component={SelectPlayersDragDrop} options={{ drawerLabel: 'SelectPlayersDragDrop', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomeSelectProfile" component={HomeSelectProfile} options={{ drawerLabel: 'Change Profile', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, headerShown: false }} />
-        <Drawer.Screen name="HomePlayer" component={HomePlayer} options={{ drawerLabel: 'Player Home', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomePlayerAddTeam" component={HomePlayerAddTeam} options={{ drawerLabel: 'Player Home Add Team', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="SignUp" component={SignUp} options={{ drawerLabel: 'Sign Up', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="Loading" component={Loading} options={{ drawerLabel: 'Loading...', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="Login" component={Login} options={{ drawerLabel: 'Login', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="AddTeamHome" component={AddTeamHome} options={{ drawerLabel: 'Add Team', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="AddPlayersHome" component={AddPlayersHome} options={{ drawerLabel: 'Add Players', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false  }} />
-        <Drawer.Screen name="GameHome" component={GameHome}  options={{ drawerLabel: 'Game Home', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }}/>
-        <Drawer.Screen name="SubstitutionHome" component={SubstitutionHome} options={{ headerShown: false, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="GameEnds" component={GameEnds} options={{ drawerLabel: 'Game Home', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="SetupHome" component={SetupHome} options={{ drawerLabel: 'Game Options', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="EditTeamName" component={EditTeamName} options={{ drawerLabel: 'EditTeamName', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="EditPlayerName" component={EditPlayerName} options={{ drawerLabel: 'EditPlayerName', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="EventsHome" component={EventsHome} options={{ drawerLabel: 'EventsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="AddSeasonHome" component={AddSeasonHome} options={{ drawerLabel: 'AddSeasonHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="PreviousGamesHome" component={PreviousGamesHome} options={{ drawerLabel: 'PreviousGamesHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="PrevGamesEventsHome" component={PrevGamesEventsHome} options={{ drawerLabel: 'PrevGamesEventsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="PlayerStatsHome" component={PlayerStatsHome} options={{ drawerLabel: 'PlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="IndividualPlayerStatsHome" component={IndividualPlayerStatsHome} options={{ drawerLabel: 'IndividualPlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="SendPlayerInviteHome" component={SendPlayerInviteHome} options={{ drawerLabel: 'Share Live Scores', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="HomePlayerTeamsList" component={HomePlayerTeamsList} options={{ drawerLabel: 'HomePlayerTeamsList', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomePlayerPreviousGamesHome" component={HomePlayerPreviousGamesHome} options={{ drawerLabel: 'HomePlayerPreviousGamesHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="AddPlayerHome" component={AddPlayerHome} options={{ drawerLabel: 'AddPlayerHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="AddPlayerAdd" component={AddPlayerAdd} options={{ drawerLabel: 'AddPlayerAdd', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomePlayerPlayersList" component={HomePlayerPlayersList} options={{ drawerLabel: 'HomePlayerPlayersList', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="HomePlayerStatsHome" component={HomePlayerStatsHome} options={{ drawerLabel: 'HomePlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomePlayerLiveScores" component={HomePlayerLiveScores} options={{ drawerLabel: 'HomePlayerLiveScores', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="EventsHomePlayer" component={EventsHomePlayer} options={{ drawerLabel: 'EventsHomePlayer', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
-        <Drawer.Screen name="StatsHomePlayer" component={StatsHomePlayer} options={{ drawerLabel: 'StatsHomePlayer', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="SignOut" component={SignOut} options={{ drawerLabel: 'Sign Out', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="DeleteUser" component={DeleteUser} options={{ drawerLabel: 'Delete User Profile', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="StepOne" component={StepOne} options={{ drawerLabel: 'StepOne', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepTwo" component={StepTwo} options={{ drawerLabel: 'StepTwo', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepThree" component={StepThree} options={{ drawerLabel: 'StepThree', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepImportant" component={StepImportant} options={{ drawerLabel: 'StepImportant', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepFour" component={StepFour} options={{ drawerLabel: 'StepFour', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepFive" component={StepFive} options={{ drawerLabel: 'StepFive', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepSix" component={StepSix} options={{ drawerLabel: 'StepSix', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepSeven" component={StepSeven} options={{ drawerLabel: 'StepSeven', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="StepFirst" component={StepFirst} options={{ drawerLabel: 'Game Instructions', headerTitle: (props) => <HeaderImage />, headerShown: false, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="StepLast" component={StepLast} options={{ drawerLabel: 'StepLast', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="EditGameTime" component={EditGameTime} options={{ drawerLabel: 'EditGameTime', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="SeasonPositionSortAllHome" component={SeasonPositionSortAllHome} options={{ drawerLabel: 'SeasonPositionSortAllHome', drawerItemStyle: {display: "none"}, headerShown: false }} />
-        <Drawer.Screen name="SelectSeasonHome" component={SelectSeasonHome} options={{ drawerLabel: 'SelectSeasonHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="AddPlayersList" component={AddPlayersList} options={{ drawerLabel: 'AddPlayersList', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="DrillsHome" component={DrillsHome} options={{ drawerLabel: 'DrillsHome', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="DrillsInstructions" component={DrillsInstructions} options={{ drawerLabel: 'DrillsInstructions', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="Iap" component={Iap} options={{ drawerLabel: 'Buy Pro', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="IapConfrim" component={IapConfrim} options={{ drawerLabel: 'IapConfrim', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="SendCoachIdHome" component={SendCoachIdHome} options={{ drawerLabel: 'SendCoachIdHome', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="HomeParentAddTeam" component={HomeParentAddTeam} options={{ drawerLabel: 'HomeParentAddTeam', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="SelectPlayerTimeDesc" component={SelectPlayerTimeDesc} options={{ drawerLabel: 'SelectPlayerTimeDesc', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="SupportPage" component={SupportPage} options={{ drawerLabel: 'Contact Support', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage /> }} />
-        <Drawer.Screen name="SelectSubTimeDesc" component={SelectSubTimeDesc} options={{ drawerLabel: 'SelectSubTimeDesc', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-        <Drawer.Screen name="AddAiTeamPlayersPositionHome" component={AddAiTeamPlayersPositionHome} options={{ drawerLabel: 'AddAiTeamPlayersPositionHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+            }}}
+            screenOptions={{
+          headerStyle: {
+            backgroundColor: '#000',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+        >
+          <Drawer.Screen name="Home" component={Home} options={{ drawerLabel: 'Home', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="KnightMoves" component={KnightMoves} options={{ drawerLabel: 'KnightMoves', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}}} />
+          <Drawer.Screen name="SelectPlayersDragDrop" component={SelectPlayersDragDrop} options={{ drawerLabel: 'SelectPlayersDragDrop', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomeSelectProfile" component={HomeSelectProfile} options={{ drawerLabel: 'Change Profile', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, headerShown: false }} />
+          <Drawer.Screen name="HomePlayer" component={HomePlayer} options={{ drawerLabel: 'Player Home', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomePlayerAddTeam" component={HomePlayerAddTeam} options={{ drawerLabel: 'Player Home Add Team', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="SignUp" component={SignUp} options={{ drawerLabel: 'Sign Up', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="Loading" component={Loading} options={{ drawerLabel: 'Loading...', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="Login" component={Login} options={{ drawerLabel: 'Login', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AddTeamHome" component={AddTeamHome} options={{ drawerLabel: 'Add Team', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="AddPlayersHome" component={AddPlayersHome} options={{ drawerLabel: 'Add Players', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false  }} />
+          <Drawer.Screen name="GameHome" component={GameHome}  options={{ drawerLabel: 'Game Home', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }}/>
+          <Drawer.Screen name="SubstitutionHome" component={SubstitutionHome} options={{ headerShown: false, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="GameEnds" component={GameEnds} options={{ drawerLabel: 'Game Home', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SetupHome" component={SetupHome} options={{ drawerLabel: 'Game Options', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="EditTeamName" component={EditTeamName} options={{ drawerLabel: 'EditTeamName', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="EditPlayerName" component={EditPlayerName} options={{ drawerLabel: 'EditPlayerName', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="EventsHome" component={EventsHome} options={{ drawerLabel: 'EventsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="AddSeasonHome" component={AddSeasonHome} options={{ drawerLabel: 'AddSeasonHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="PreviousGamesHome" component={PreviousGamesHome} options={{ drawerLabel: 'PreviousGamesHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="PrevGamesEventsHome" component={PrevGamesEventsHome} options={{ drawerLabel: 'PrevGamesEventsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="PlayerStatsHome" component={PlayerStatsHome} options={{ drawerLabel: 'PlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="IndividualPlayerStatsHome" component={IndividualPlayerStatsHome} options={{ drawerLabel: 'IndividualPlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="SendPlayerInviteHome" component={SendPlayerInviteHome} options={{ drawerLabel: 'Share Live Scores', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="HomePlayerTeamsList" component={HomePlayerTeamsList} options={{ drawerLabel: 'HomePlayerTeamsList', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomePlayerPreviousGamesHome" component={HomePlayerPreviousGamesHome} options={{ drawerLabel: 'HomePlayerPreviousGamesHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AddPlayerHome" component={AddPlayerHome} options={{ drawerLabel: 'AddPlayerHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AddPlayerAdd" component={AddPlayerAdd} options={{ drawerLabel: 'AddPlayerAdd', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomePlayerPlayersList" component={HomePlayerPlayersList} options={{ drawerLabel: 'HomePlayerPlayersList', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="HomePlayerStatsHome" component={HomePlayerStatsHome} options={{ drawerLabel: 'HomePlayerStatsHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomePlayerLiveScores" component={HomePlayerLiveScores} options={{ drawerLabel: 'HomePlayerLiveScores', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="EventsHomePlayer" component={EventsHomePlayer} options={{ drawerLabel: 'EventsHomePlayer', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, unmountOnBlur: true }} />
+          <Drawer.Screen name="StatsHomePlayer" component={StatsHomePlayer} options={{ drawerLabel: 'StatsHomePlayer', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SignOut" component={SignOut} options={{ drawerLabel: 'Sign Out', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="DeleteUser" component={DeleteUser} options={{ drawerLabel: 'Delete User Profile', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="StepOne" component={StepOne} options={{ drawerLabel: 'StepOne', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepTwo" component={StepTwo} options={{ drawerLabel: 'StepTwo', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepThree" component={StepThree} options={{ drawerLabel: 'StepThree', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepImportant" component={StepImportant} options={{ drawerLabel: 'StepImportant', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepFour" component={StepFour} options={{ drawerLabel: 'StepFour', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepFive" component={StepFive} options={{ drawerLabel: 'StepFive', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepSix" component={StepSix} options={{ drawerLabel: 'StepSix', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepSeven" component={StepSeven} options={{ drawerLabel: 'StepSeven', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="StepFirst" component={StepFirst} options={{ drawerLabel: 'Game Instructions', headerTitle: (props) => <HeaderImage />, headerShown: false, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="StepLast" component={StepLast} options={{ drawerLabel: 'StepLast', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="EditGameTime" component={EditGameTime} options={{ drawerLabel: 'EditGameTime', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SeasonPositionSortAllHome" component={SeasonPositionSortAllHome} options={{ drawerLabel: 'SeasonPositionSortAllHome', drawerItemStyle: {display: "none"}, headerShown: false }} />
+          <Drawer.Screen name="SelectSeasonHome" component={SelectSeasonHome} options={{ drawerLabel: 'SelectSeasonHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AddPlayersList" component={AddPlayersList} options={{ drawerLabel: 'AddPlayersList', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="DrillsHome" component={DrillsHome} options={{ drawerLabel: 'DrillsHome', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="DrillsInstructions" component={DrillsInstructions} options={{ drawerLabel: 'DrillsInstructions', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="Iap" component={Iap} options={{ drawerLabel: 'Buy Pro', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="IapConfrim" component={IapConfrim} options={{ drawerLabel: 'IapConfrim', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SendCoachIdHome" component={SendCoachIdHome} options={{ drawerLabel: 'SendCoachIdHome', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="HomeParentAddTeam" component={HomeParentAddTeam} options={{ drawerLabel: 'HomeParentAddTeam', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SelectPlayerTimeDesc" component={SelectPlayerTimeDesc} options={{ drawerLabel: 'SelectPlayerTimeDesc', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="SupportPage" component={SupportPage} options={{ drawerLabel: 'Contact Support', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="SelectSubTimeDesc" component={SelectSubTimeDesc} options={{ drawerLabel: 'SelectSubTimeDesc', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AddAiTeamPlayersPositionHome" component={AddAiTeamPlayersPositionHome} options={{ drawerLabel: 'AddAiTeamPlayersPositionHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
+          <Drawer.Screen name="AppolloHooksTest" component={AppolloHooksTest} options={{ drawerLabel: 'AppolloHooksTest', headerTitle: (props) => <HeaderImage /> }} />
+        </Drawer.Navigator>
+      </NavigationContainer>
+    </ApolloProvider>
   );
 });
 
