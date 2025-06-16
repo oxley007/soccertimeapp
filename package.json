@@ -11,6 +11,7 @@
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
     "@invertase/react-native-apple-authentication": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.18.1",
     "@react-native-firebase/app": "^17.4.2",
@@ -22,6 +23,7 @@
     "@react-navigation/native": "^6.1.6",
     "@redux-devtools/extension": "^3.2.5",
     "expo": "^49.0.3",
+    "graphql": "^16.11.0",
     "jetifier": "^2.0.0",
     "native-base": "^3.4.28",
     "react": "18.2.0",
