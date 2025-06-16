@@ -13,7 +13,7 @@ export const updateFromContinueGame = ( fromContinueGame ) => ({
 });
 
 const initialState = {
-  fromContinueGame: 0,
+  fromContinueGame: 1,
 };
 
 

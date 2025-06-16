@@ -3072,7 +3072,6 @@ console.log('hit cehcek 3');
       return (
         <Box>
           <Text style={{ color: '#fff', fontSize: 22, lineHeight: 22, marginBottom: 6 }}>{productButtontext}:</Text>
-          <Text style={{ color: '#fff', fontSize: 12, lineHeight: 12, marginBottom: 6 }}>product identifier: {product.identifier}</Text>
           {(product.identifier === 'pro_season_indv' || product.identifier === 'pro_season_team' || product.identifier === 'pro_season_player' || product.identifier === 'pro_season_indiv_android:season-sub-2499' || product.identifier === 'pro_season_team_android:season-sub-team-13999' || product.identifier === 'pro_season_player_android:season-sub-player-2499') &&
             <Box style={{backgroundColor: '#FACC15', borderRadius: 15, padding: 3, paddingLeft: 10, paddingRight: 10, marginTop: 5}}>
               <Text style={{color: '#000', fontSize: 12, fontWeight: '600'}}>Risk Free - 1 week Free Trial - Cancel Anytime!</Text>

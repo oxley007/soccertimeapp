@@ -1817,10 +1817,34 @@ try {
 
   const backHomeNow = () => {
 
-		const gameId = games[0].gameId
-		navigate('Home',{
-      updateHome: gameId
-    });
+    let playerOnField = 0
+    try {
+      games[0].teamPlayers.map(player => {
+
+        if (player.positionDetails.column > 1 && player.positionDetails.row < 4) {
+          playerOnField = playerOnField + 1
+        }
+        else {
+          playerOnField = playerOnField
+        }
+
+      })
+    }
+    catch {
+      playerOnField = 0
+    }
+
+    if (playerOnField === 0) {
+      Alert.alert('Please add at least one player to the field before saving.');
+    }
+    else {
+      const gameId = games[0].gameId
+  		navigate('Home',{
+        updateHome: gameId
+      });
+    }
+
+
 
 	}
 
@@ -1944,7 +1968,7 @@ try {
                     {dragDropView()}
 
                     <Text style={{fontSize: 16, color: '#fff'}}><Text style={{fontSize: 22, color: '#fff'}}>*</Text>Total time as goalie only</Text>
-                    <Text style={{fontSize: 16, color: '#fff'}}><Text style={{fontSize: 22, color: '#fff'}}>†</Text>Does not include time played as goalie</Text>
+                    <Text style={{fontSize: 16, color: '#fff', paddingBottom: 20}}><Text style={{fontSize: 22, color: '#fff'}}>†</Text>Does not include time played as goalie</Text>
                   </ScrollView>
 
 
