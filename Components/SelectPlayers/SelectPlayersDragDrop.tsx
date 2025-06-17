@@ -39,6 +39,8 @@ import SeasonPositionSortAll from '../PlayerStats/SeasonPositionSortAll.js'
 import SelectPlayerTime from './SelectPlayerTime.js'
 import SelectPlayerList from '../AddPlayers/SelectPlayerList.js'
 import PositionSortNew from './PositionSortNew.js'
+import AssignPlayerPositions from '../AddAiPositions/AssignPlayerPositions.js'
+
 
 import { updateGames } from '../../Reducers/games';
 import { updateTeamPlayers } from '../../Reducers/teamPlayers';
@@ -2224,7 +2226,9 @@ catch {
 
 
 		return (
+			<Box>
 			<PositionSortNew playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+			</Box>
 		)
 
 	}
