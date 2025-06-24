@@ -130,8 +130,36 @@ const IapConfrim = (props)=>{
 
   }
 
+  const continueBackToGame = (navigateBackName, gameIdDb) => {
+
+
+    try {
+      navigate(navigateBackName, {
+        fromContinue: false,
+        gameIdDb: gameIdDb,
+      })
+    }
+    catch {
+      navigate('Home')
+    }
+
+  }
+
   const getButtonDisplay = () => {
 
+    let navigateBackCheck = false
+    let navigateBackName = ''
+    let gameIdDb = ''
+    try {
+      navigateBackCheck = props.route.params.navigateBack
+      navigateBackName = props.route.params.navigateBackName
+      gameIdDb = props.route.params.gameIdDb
+    }
+    catch {
+      navigateBackCheck = false
+      navigateBackName = ''
+      gameIdDb = ''
+    }
 
     console.log(checkSortIap + ' is?');
     if (checkSortIap === 0) {
@@ -142,6 +170,21 @@ const IapConfrim = (props)=>{
       )
     }
     else if (teamPlayers.length < 1 || userProfile > 1) {
+      return (
+        <Button style={{marginTop: 20}} minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Home</Button>
+      )
+    }
+    if (navigateBackCheck === true && navigateBackName !== '') {
+      return (
+        <Button style={{marginTop: 20}} minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueBackToGame(navigateBackName, gameIdDb)}>Back to Game</Button>
+      )
+    }
+    else if (teamPlayers.length < 1 || userProfile > 1) {
+      return (
+        <Button style={{marginTop: 20}} minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Home</Button>
+      )
+    }
+    else if (checkSortIap === 1) {
       return (
         <Button style={{marginTop: 20}} minW="100%" bg="#E879F9" size="md" _text={{fontSize: "xl", color: '#fff'}} variant="subtle" onPress={() => continueSetup()}>Home</Button>
       )

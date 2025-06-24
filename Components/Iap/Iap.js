@@ -979,13 +979,31 @@ catch {
 
       })
 
+      let navigateBackCheck = false
+      let navigateBackName = ''
+      let gameIdDb = ''
+      try {
+        navigateBackCheck = props.route.params.navigateBack
+        navigateBackName = props.route.params.navigateBackName
+        gameIdDb = props.route.params.gameIdDb
+      }
+      catch {
+        navigateBackCheck = false
+        navigateBackName = ''
+        gameIdDb = ''
+      }
+
+
       navigate('IapConfrim', {
         purchasedProduct: storeProduct,
         expiryDate: epochDate,
         productNameTitle: productNameTitle,
         teamType: getTeamType,
         addTeamOnly: getAddTeamOnly,
-        gameIdDb: getGameIdDb
+        gameIdDb: getGameIdDb,
+        navigateBackCheck: navigateBackCheck,
+        navigateBackName: navigateBackName,
+        gameIdDb: gameIdDb
       });
 
     } catch (e) {
@@ -1198,14 +1216,32 @@ catch {
 
      console.log('check here 10');
 
-        navigate('IapConfrim', {
-          purchasedProduct: storeProduct.identifier,
-          expiryDate: epochDate,
-          productNameTitle: productNameTitle,
-          teamType: getTeamType,
-          addTeamOnly: getAddTeamOnly,
-          gameIdDb: getGameIdDb
-        });
+     let navigateBackCheck = false
+     let navigateBackName = ''
+     let gameIdDb = ''
+     try {
+       navigateBackCheck = props.route.params.navigateBack
+       navigateBackName = props.route.params.navigateBackName
+       gameIdDb = props.route.params.gameIdDb
+     }
+     catch {
+       navigateBackCheck = false
+       navigateBackName = ''
+       gameIdDb = ''
+     }
+
+
+     navigate('IapConfrim', {
+       purchasedProduct: storeProduct,
+       expiryDate: epochDate,
+       productNameTitle: productNameTitle,
+       teamType: getTeamType,
+       addTeamOnly: getAddTeamOnly,
+       gameIdDb: getGameIdDb,
+       navigateBackCheck: navigateBackCheck,
+       navigateBackName: navigateBackName,
+       gameIdDb: gameIdDb
+     });
 
     } catch (e) {
    console.log(JSON.stringify(e) + ' JSON payment error');

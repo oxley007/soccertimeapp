@@ -8,6 +8,12 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import SeasonStats from '../SeasonStats/SeasonStats'
 
+import { calculatePlayerLiveStats, calculatePlayerStats, combineSeasonAndLiveStats } from '../../Util/playerStatsUtils';
+
+// Example usage:
+//const liveStats = calculatePlayerLiveStats(player);
+
+
 import { updateGames } from '../../Reducers/games';
 import { updateStatsSort } from '../../Reducers/statsSort';
 import { updateSortIndex } from '../../Reducers/sortIndex';
@@ -61,28 +67,25 @@ const PositionSortNew = (props)=>{
     const { navigate } = props.navigation;
 
     useEffect(() => {
-      const stats = teamPlayers.map((player) => calculatePlayerStats(player));
-      setPlayerStats(stats);
+    const stats = teamPlayers.map((player) => calculatePlayerStats(player));
+    console.log('stats are??? ' + JSON.stringify(stats) );
+    setPlayerStats(stats);
 
-      if (games.length > 0 && Array.isArray(games[0].teamPlayers)) {
-        const statsLive = games[0].teamPlayers.map((player) => calculatePlayerLiveStats(player));
-        setPlayerLiveStats(statsLive);
+    if (games.length > 0 && Array.isArray(games[0].teamPlayers)) {
+      const statsLive = games[0].teamPlayers.map((player) =>
+        calculatePlayerLiveStats(player, sixtySecondsMark) // <== now passing dynamic value
+      );
+      setPlayerLiveStats(statsLive);
 
-        const combinedStats = combineSeasonAndLiveStats(stats, statsLive);
-        setCombinedPlayerStats(combinedStats);
-      } else {
-        setPlayerLiveStats([]); // fallback
-        setCombinedPlayerStats(stats); // just use season stats if no live data
-      }
-      /*
-      const stats = teamPlayers.map((player) => calculatePlayerStats(player));
-      setPlayerStats(stats);
-      const statsLive = games[0].teamPlayers.map((player) => calculatePlayerLiveStats(player));
-      setPlayerLiveStats(statsLive)
       const combinedStats = combineSeasonAndLiveStats(stats, statsLive);
+      console.log('combinedStats are?? ' + JSON.stringify(combinedStats) );
       setCombinedPlayerStats(combinedStats);
-      */
-    }, [teamPlayers, sixtySecondsMark]);
+    } else {
+      setPlayerLiveStats([]);
+      setCombinedPlayerStats(stats);
+    }
+  }, [teamPlayers, games, sixtySecondsMark]);
+
 
     useEffect(() => {
       const sorted = sortPlayerStats(combinedPlayerStats, selectedFilter);
@@ -90,6 +93,47 @@ const PositionSortNew = (props)=>{
       setFilteredStats(sorted);
     }, [selectedFilter, combinedPlayerStats]);
 
+    const positionKeys = ['fwd', 'mid', 'def', 'gol', 'sub'];
+
+  const calculatePlayerStatsOld = (player) => {
+    const totals = { fwd: 0, mid: 0, def: 0, gol: 0, sub: 0 };
+
+    const gamesArray = Array.isArray(player.postionTimeStats) ? player.postionTimeStats : [];
+
+    for (const game of gamesArray) {
+      const posTimes = game.posTimes || {};
+      for (const pos of positionKeys) {
+        const entries = Array.isArray(posTimes[pos]) ? posTimes[pos] : [];
+        for (const { st = 0, fin = 0 } of entries) {
+          const duration = Math.max(0, fin - st);
+          if (duration > 0 && duration < 1000000) {
+            totals[pos] += duration;
+          }
+        }
+      }
+    }
+
+
+    const onFieldTime = totals.fwd + totals.mid + totals.def + totals.gol;
+    const totalTime = onFieldTime + totals.sub;
+    const percent = (val) => (totalTime > 0 ? Math.round((val / totalTime) * 100) : 0);
+
+    return {
+      playerName: player.playerName,
+      playerId: player.playerId,
+      id: player.id,
+      percentTotal: percent(onFieldTime).toString(),
+      fwdTotalPercent: (percent(totals.fwd) - 0).toString(),
+      midTotalPercent: (percent(totals.mid) - 0).toString(),
+      defTotalPercent: (percent(totals.def) - 0).toString(),
+      golTotalPercent: (percent(totals.gol) - 0).toString(),
+      fwdTotalTime: totals.fwd,
+      midTotalTime: totals.mid,
+      defTotalTime: totals.def,
+      golTotalTime: totals.gol,
+      subTotalTime: totals.sub,
+    };
+  };
 
     /*
     useEffect(() => {
@@ -98,6 +142,7 @@ const PositionSortNew = (props)=>{
     }, [sixtySecondsMark]);
     */
 
+    /*
     const calculatePlayerLiveStats = (player) => {
       const { playerName, playerId, currentPosition, gameStats, postionTimes } = player;
 
@@ -221,6 +266,7 @@ const PositionSortNew = (props)=>{
     };
   });
 };
+*/
 
 const getPositionBar = (stats) => {
 
@@ -505,7 +551,7 @@ const upgradeToPro = () => {
 
 
 
-            
+
           </Box>
         }
         {fromContinueGame === 1 &&

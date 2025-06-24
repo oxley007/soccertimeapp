@@ -33,7 +33,8 @@ import eventsVersion from './eventsVersion'
 import gameOptionBoardFrom from './gameOptionBoardFrom'
 import checkSortIap from './checkSortIap'
 import fromContinueGame from './fromContinueGame'
-
+import subSuggestions from './subSuggestions'
+import aiTokens from './aiTokens'
 
 export default combineReducers({
   games,
@@ -68,4 +69,6 @@ export default combineReducers({
   gameOptionBoardFrom,
   checkSortIap,
   fromContinueGame,
+  subSuggestions,
+  aiTokens,
 });

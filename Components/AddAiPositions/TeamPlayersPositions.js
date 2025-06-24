@@ -1,7 +1,13 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import { useDispatch } from 'react-redux';
-//import { updateGames, updateTeamPlayers } from '../redux/actions'; // adjust path if needed
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
@@ -16,9 +22,10 @@ const positionLabels = {
 };
 
 const TeamPlayersPositions = ({ games }) => {
-
   const dispatch = useDispatch();
   const currentUser = auth().currentUser;
+
+  const [loadingPlayerId, setLoadingPlayerId] = useState(null); // <-- loading state
 
   if (!currentUser) {
     return <Text>Loading user info...</Text>;
@@ -30,43 +37,40 @@ const TeamPlayersPositions = ({ games }) => {
   const handleTogglePosition = async (playerIndex, posKey) => {
     const updatedGames = [...games];
     const updatedTeamPlayers = [...teamPlayers];
-
-    // Get current player object
     const player = { ...updatedTeamPlayers[playerIndex] };
-
-    // Ensure playerPositions object exists
-    if (!player.playerPositions) {
-      player.playerPositions = {};
-    }
-
-    // Toggle the boolean
-    const currentStatus = player.playerPositions[posKey] ?? false;
-    player.playerPositions[posKey] = !currentStatus;
-
-    // Save changes back to both arrays
-    updatedTeamPlayers[playerIndex] = player;
-    updatedGames[0].teamPlayers = updatedTeamPlayers;
-
-    // Dispatch to Redux
-    dispatch(updateTeamPlayers(updatedTeamPlayers));
-    dispatch(updateGames(updatedGames));
 
     if (!player.playerId) {
       console.warn('playerId missing for player at index', playerIndex);
       return;
     }
 
+    setLoadingPlayerId(player.playerId); // <-- start loading
+
     try {
+      if (!player.playerPositions) {
+        player.playerPositions = {};
+      }
+
+      const currentStatus = player.playerPositions[posKey] ?? false;
+      player.playerPositions[posKey] = !currentStatus;
+
+      updatedTeamPlayers[playerIndex] = player;
+      updatedGames[0].teamPlayers = updatedTeamPlayers;
+
+      dispatch(updateTeamPlayers(updatedTeamPlayers));
+      dispatch(updateGames(updatedGames));
+
       await userRef.doc(player.playerId).set(
         {
           playerPositions: player.playerPositions,
         },
-        { merge: true } // <-- this merges the update with existing data, not overwrite whole doc
+        { merge: true }
       );
     } catch (error) {
       console.error('Error updating playerPositions in Firestore:', error.message);
+    } finally {
+      setLoadingPlayerId(null); // <-- stop loading
     }
-
   };
 
   return (
@@ -77,27 +81,36 @@ const TeamPlayersPositions = ({ games }) => {
         <View style={styles.playerContainer}>
           <Text style={styles.playerName}>{item.playerName}</Text>
           <View style={styles.buttonsContainer}>
-            {Object.entries(positionLabels).map(([key, label]) => (
-              <TouchableOpacity
-                key={key}
-                onPress={() => {
-                  handleTogglePosition(index, key).catch(console.error);
-                }}
-                style={[
-                  styles.positionButton,
-                  item.playerPositions?.[key] && styles.activeButton,
-                ]}
-              >
-                <Text
+            {Object.entries(positionLabels).map(([key, label]) => {
+              const isActive = item.playerPositions?.[key];
+              const isLoading = loadingPlayerId === item.playerId;
+
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => handleTogglePosition(index, key).catch(console.error)}
+                  disabled={isLoading}
                   style={[
-                    styles.buttonText,
-                    item.playerPositions?.[key] && styles.activeButtonText,
+                    styles.positionButton,
+                    isActive && styles.activeButton,
+                    isLoading && { opacity: 0.6 },
                   ]}
                 >
-                  {label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        isActive && styles.activeButtonText,
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       )}
@@ -110,13 +123,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ddd',
-    backgroundColor: '#222'
+    backgroundColor: '#222',
   },
   playerName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#fff'
+    color: '#fff',
   },
   buttonsContainer: {
     flexDirection: 'row',

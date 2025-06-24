@@ -560,7 +560,7 @@ catch {
 	//do nothing.
 }
 
-})
+},[eventsVersion])
 }
 catch {
 	//do nothing.
@@ -2227,7 +2227,26 @@ catch {
 
 		return (
 			<Box>
+			<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
 			<PositionSortNew playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+			</Box>
+		)
+
+	}
+
+	const displayAiSubPositions = (fromLiveGame) => {
+
+		/*
+		console.log('need this data teamPlayers ' + JSON.stringify(teamPlayers));
+		console.log(playerIndexPos + ' playerIndexPos atatas')
+		console.log(getLatestId + ' getLatestId')
+		console.log(playerIndex + ' playerIndex')
+		*/
+
+		return (
+			<Box>
+				<Text syle={{color: '#fff'}}>hiya!</Text>
+				<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
 			</Box>
 		)
 
@@ -2302,6 +2321,12 @@ catch {
 						<View>
 						{checkPlayerCountNew()}
 						{displayPositionSort(false)}
+						</View>
+					}
+
+					{fromContinueGame === 1 &&
+						<View>
+							{displayAiSubPositions(true)}
 						</View>
 					}
 
@@ -2382,6 +2407,12 @@ catch {
 					<View>
 					{checkPlayerCountNew()}
 					{displayPositionSort(false)}
+					</View>
+				}
+
+				{fromContinueGame === 1 &&
+					<View>
+						{displayAiSubPositions(true)}
 					</View>
 				}
 

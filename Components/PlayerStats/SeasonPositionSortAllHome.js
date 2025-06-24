@@ -41,6 +41,7 @@ import KickOff from '../Game/KickOff.js';
 import GameOptions from '../Game/GameOptions.js';
 import GameOptionsUndo from '../Game/GameOptionsUndo.js';
 import DisplayScoreHomePlayer from '../Events/DisplayScoreHomePlayer.js';
+import AssignPlayerPositions from '../AddAiPositions/AssignPlayerPositions.js'
 
 import { updateGames } from '../../Reducers/games';
 import { updateGameOptionBoard } from '../../Reducers/gameOptionBoard';
@@ -516,7 +517,7 @@ try {
              const playerId = player.playerId
 
              let timeIndex = 0
-             let timeCount = 0
+             let timeCount = 0 
              postionTimeStatsRaw.map(time => {
                if (time.gameId === games[0].id) {
                  if (timeCount > 0) {
@@ -2112,14 +2113,14 @@ try {
 
 
                   <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#222', '#222']} style={styles.linearGradientLive}>
-                  <Button variant="unstyled" onPress={() => goToEvents()}>
-                    <HStack >
-                    <Center>
-                      {trophyIcon}
-                      <Text style={styles.textLiveScore}>Live Scores</Text>
-                      </Center>
-                    </HStack>
-                  </Button>
+                    <Button variant="unstyled" onPress={() => goToEvents()}>
+                      <HStack >
+                      <Center>
+                        {trophyIcon}
+                        <Text style={styles.textLiveScore}>Live Scores</Text>
+                        </Center>
+                      </HStack>
+                    </Button>
                   </LinearGradient>
 
 
@@ -2286,6 +2287,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 15,
     paddingRight: 15,
+  },
+  linearGradientLiveSubs: {
+    flex: 1,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderColor: '#e879f9',
+    borderWidth: 2
   },
   textBottomMenu: {
     color: '#ccc',

@@ -2159,6 +2159,46 @@ const Home = (props)=>{
 
   };
 
+  const handleUpdateId = async () => {
+
+    let _teamPlayers = []
+    try {
+      _teamPlayers = [...teamPlayers]
+    }
+    catch {
+      _teamPlayers = [{...teamPlayers}]
+    }
+
+    const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+
+    // Update local _teamPlayers array
+    let playerId = 0;
+
+    const updatedPlayers = _teamPlayers.map(player => {
+      if (player.playerId === 'JR5885') {
+        playerId = player.playerId;
+        return { ...player, id: uniqueId };
+      }
+      return player;
+    });
+
+    // Dispatch updated teamPlayers to Redux
+    dispatch(updateTeamPlayers(updatedPlayers));
+
+    // Update Firestore: Only update the `id` field
+    const teamIdCodeGames = games[0].teamIdCode
+    try {
+      await userRef.doc(playerId).update({ id: uniqueId });
+      await firestore().collection(teamIdCodeGames).doc(playerId).update({ id: uniqueId });
+      console.log(`Player ID updated to ${uniqueId}`);
+    } catch (error) {
+      console.error('Error updating player ID in Firestore:', error);
+    }
+
+
+
+  };
+
 
 
         return (
@@ -2556,6 +2596,7 @@ const Home = (props)=>{
   </Box>
   }
               <Text style={{color: 'transparent', fontSize: 0, lineHeight: 0}} >{getHalfTimeFlag}</Text>
+              <Button minW="100%" bg="#E879F9" size="md" pt="5" pb="5" _text={{fontSize: 26, color: '#fff'}} variant="subtle" onPress={() => handleUpdateId()}>Fix ID 12 Only</Button>
 
             </ScrollView>
           </Container>

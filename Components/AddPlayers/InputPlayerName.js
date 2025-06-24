@@ -160,8 +160,10 @@ const InputPlayerName = (props)=>{
           gol: true
         }
 
+        const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // e.g., 1718753439001257
+
         const newPlayer = {
-          id: teamPlayersLength,
+          id: uniqueId,
           playerId: playerId,
           teamId: teamId,
           teamIdCode: teamIdCode,
@@ -256,7 +258,8 @@ const InputPlayerName = (props)=>{
 
          try {
         userRef.doc(playerId).set({
-            id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
+            //id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
+            id: uniqueId, playerId: playerId, teamId: teamId, teamIdCode: teamIdCode, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
           })
           .catch(error => this.setState({ errorMessage: error.message }))
 
@@ -264,7 +267,8 @@ const InputPlayerName = (props)=>{
 
 
           firestore().collection(teamIdCodeGames).doc(playerId).set({
-             id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCodeGames, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
+             //id: teamPlayersLength, playerId: playerId, teamId: teamId, teamIdCode: teamIdCodeGames, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
+             id: uniqueId, playerId: playerId, teamId: teamId, teamIdCode: teamIdCodeGames, playerName: input.value, stats: {}, postionTimeStats: {}, inviteStatus: 0, isPlayer: true
            })
          }
          catch {
