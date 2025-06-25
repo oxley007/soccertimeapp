@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import {
   View,
@@ -60,6 +60,7 @@ const SubSuggestions: React.FC<any> = (props) => {
 
   const [playerLiveStats, setPlayerLiveStats] = useState([]);
   const [combinedPlayerStats, setCombinedPlayerStats] = useState([]);
+  const [activeSubId, setActiveSubId] = useState(null);
 
   const seasonSubSuggestions = useSelector(
     (state: RootState) => state.subSuggestions.seasonSubSuggestions
@@ -77,66 +78,83 @@ const SubSuggestions: React.FC<any> = (props) => {
   const { currentUser } = auth()
   const userRef = firestore().collection(currentUser.uid);
 
+  useEffect(() => {
+    dispatch(updateSubSuggestions([], []));
+  },[])
+
   const clearAiSubs = () => {
     dispatch(updateSubSuggestions([], []));
   }
 
   const handleMakeSub = (suggestion) => {
-    const _games = [...games];
-    const teamPlayers = _games[0].teamPlayers;
+    setActiveSubId(suggestion.subId); // Start loading this sub
 
-    const subIndex = teamPlayers.findIndex(p => p.playerId === suggestion.subId);
-    const fieldIndex = teamPlayers.findIndex(p => p.playerId === suggestion.fieldPlayerId);
+    try {
+      const _games = [...games];
+      const teamPlayers = _games[0].teamPlayers;
 
-    if (subIndex === -1 || fieldIndex === -1) {
-      console.warn('One or both players not found for substitution');
-      return;
+      const subIndex = teamPlayers.findIndex(p => p.playerId === suggestion.subId);
+      const fieldIndex = teamPlayers.findIndex(p => p.playerId === suggestion.fieldPlayerId);
+
+      if (subIndex === -1 || fieldIndex === -1) {
+        console.warn('One or both players not found for substitution');
+        setActiveSubId(null); // Clear loading if early exit
+        return;
+      }
+
+      // Swap field player → sub
+      teamPlayers[fieldIndex] = {
+        ...teamPlayers[fieldIndex],
+        currentPosition: 'sub',
+        positionDetails: {
+          ...teamPlayers[fieldIndex].positionDetails,
+          ...(suggestion.positionDetails || {}),
+        },
+      };
+
+      // Swap sub → field
+      teamPlayers[subIndex] = {
+        ...teamPlayers[subIndex],
+        currentPosition: suggestion.position,
+        positionDetails: {
+          ...teamPlayers[subIndex].positionDetails,
+          ...(suggestion.fieldPlayerPositionDetails || {}),
+        },
+      };
+
+      const updatedEventsVersion = eventsVersion + 1;
+
+      dispatch(updateGames(_games));
+      dispatch(updateEventsVersion(updatedEventsVersion));
+
+      const teamIdCodeGames = _games[0].teamIdCode;
+      const gameIdDb = _games[0].gameIdDb;
+
+      firestore()
+        .collection(teamIdCodeGames)
+        .doc(gameIdDb)
+        .set({ game: _games[0] }, { merge: true });
+
+      userRef
+        .doc(gameIdDb)
+        .set({ game: _games[0] }, { merge: true });
+
+      // Filter out sub from both suggestion lists
+      const updatedSeasonSubs = seasonSubSuggestions.filter(s => s.subId !== suggestion.subId);
+      const updatedLiveSubs = liveSubSuggestions.filter(s => s.subId !== suggestion.subId);
+
+      dispatch(updateSubSuggestions(updatedSeasonSubs, updatedLiveSubs));
+    } catch (error) {
+      console.error('Error making sub:', error);
     }
 
-    // Swap field player → sub
-    teamPlayers[fieldIndex] = {
-      ...teamPlayers[fieldIndex],
-      currentPosition: 'sub',
-      positionDetails: {
-        ...teamPlayers[fieldIndex].positionDetails,
-        ...(suggestion.positionDetails || {}),
-      },
-    };
-
-    // Swap sub → field
-    teamPlayers[subIndex] = {
-      ...teamPlayers[subIndex],
-      currentPosition: suggestion.position,
-      positionDetails: {
-        ...teamPlayers[subIndex].positionDetails,
-        ...(suggestion.fieldPlayerPositionDetails || {}),
-      },
-    };
-
-
-    const updatedEventsVersion = eventsVersion + 1;
-
-    dispatch(updateGames(_games));
-    dispatch(updateEventsVersion(updatedEventsVersion));
-
-    const teamIdCodeGames = _games[0].teamIdCode;
-    const gameIdDb = _games[0].gameIdDb;
-
-    firestore()
-      .collection(teamIdCodeGames)
-      .doc(gameIdDb)
-      .set({ game: _games[0] }, { merge: true });
-
-    userRef
-      .doc(gameIdDb)
-      .set({ game: _games[0] }, { merge: true });
-
-    // Filter out sub from both suggestion lists
-    const updatedSeasonSubs = seasonSubSuggestions.filter(s => s.subId !== suggestion.subId);
-    const updatedLiveSubs = liveSubSuggestions.filter(s => s.subId !== suggestion.subId);
-
-    dispatch(updateSubSuggestions(updatedSeasonSubs, updatedLiveSubs));
+    // Keep the loading indicator for 3 seconds manually
+    setTimeout(() => {
+      setActiveSubId(null); // Clear loading state after 3 seconds
+    }, 3000);
   };
+
+
 
   const handleRemoveSuggestion = (subId: string) => {
     const updatedSeason = seasonSubSuggestions.filter(s => s.subId !== subId);
@@ -212,20 +230,24 @@ const SubSuggestions: React.FC<any> = (props) => {
 
             {/* Action buttons */}
             <View style={{ flexDirection: 'row', marginTop: 12, justifyContent: 'space-between' }}>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  marginRight: 8,
-                  padding: 10,
-                  borderRadius: 6,
-                  backgroundColor: '#34d399', // Tailwind green-400
-                }}
-                onPress={() => handleMakeSub(suggestion)}
-              >
-                <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
-                  Make Sub
-                </Text>
-              </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                marginRight: 8,
+                padding: 10,
+                borderRadius: 6,
+                backgroundColor: activeSubId === null ? '#34d399' : '#a7f3d0',
+                opacity: activeSubId !== null ? 0.5 : 1,
+              }}
+              disabled={activeSubId !== null}
+              onPress={() => handleMakeSub(suggestion)}
+            >
+              <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
+                {activeSubId === suggestion.subId ? 'Loading...' : 'Make Sub'}
+              </Text>
+            </TouchableOpacity>
+
 
               <TouchableOpacity
                 style={{

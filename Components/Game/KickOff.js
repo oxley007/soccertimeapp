@@ -112,15 +112,20 @@ const KickOff = (props)=>{
 
   useEffect(() => {
 
-      if (getContinueFlag === false && props.fromContinue === 1) {
-   //console.log('check am i getting in here? still? 1 = true');
+    if (getContinueFlag === false && props.fromContinue === 1) {
+    //console.log('check am i getting in here? still? 1 = true');
       setContinueFlagFlag(true)
     }
 
- //console.log('WHEN IS THIS GETTGIN HIT?');
- //console.log(sixtySecondsMark + ' sixtySecondsMark here now what?');
-    setSecondsElapsed(sixtySecondsMark)
- //console.log(getSecondsElapsed + ' Should be set to sixtySecondsMark: ' + sixtySecondsMark);
+    //console.log('WHEN IS THIS GETTGIN HIT?');
+    console.log(sixtySecondsMark + ' sixtySecondsMark here now what?');
+
+     if (typeof sixtySecondsMark === 'undefined') {
+    setSecondsElapsed(0);
+    } else {
+    setSecondsElapsed(sixtySecondsMark);
+    }
+    //console.log(getSecondsElapsed + ' Should be set to sixtySecondsMark: ' + sixtySecondsMark);
 
   },[])
 
@@ -1206,6 +1211,12 @@ const KickOff = (props)=>{
       console.log('are we getting button displays?');
       const gameHalfTimetemp = games[0].gameHalfTime
       const gameFullTimetemp = gameHalfTimetemp * 2
+
+      console.log('games[0].halfTime ' + games[0].halfTime)
+      console.log('games[0].firstHalf ' + games[0].firstHalf);
+      console.log('props.fromContinue ' + props.fromContinue);
+      console.log('getSecondsElapsed ' + getSecondsElapsed);
+
       if (getContinueFlag === true && ((games[0].firstHalf === true && games[0].secondHalf === false) || (games[0].firstHalf === false && games[0].secondHalf === true && getHalfTimeFlag < 4 && sixtySecondsMark < gameFullTimetemp)  )) {
         return (
           <Box pl="3" pr="3" pt="4" pb="4" mt="10">

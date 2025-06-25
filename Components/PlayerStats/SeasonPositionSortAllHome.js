@@ -517,7 +517,7 @@ try {
              const playerId = player.playerId
 
              let timeIndex = 0
-             let timeCount = 0 
+             let timeCount = 0
              postionTimeStatsRaw.map(time => {
                if (time.gameId === games[0].id) {
                  if (timeCount > 0) {
