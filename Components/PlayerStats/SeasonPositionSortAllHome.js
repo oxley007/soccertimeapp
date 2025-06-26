@@ -484,7 +484,8 @@ try {
 
              const playerStats = games[0].teamPlayers[playerIndex].gameStats
              //player.stats = [player.stats]
-             if (playerStats.length > 0 ) {
+             //if (playerStats.length > 0 ) {
+             if (Array.isArray(playerStats) && playerStats.length > 0) {
              try {
                player.stats.push({gameId: games[0].id, season: currentSeason, seasonName: currentSeasonName, stats: playerStats})
              }
@@ -497,7 +498,8 @@ try {
              const postionTimes = games[0].teamPlayers[playerIndex].postionTimes
              //player.postionTimeStats = [player.postionTimeStats]
              if (postionTimes.def.length > 0 || postionTimes.fwd.length > 0 || postionTimes.gol.length > 0 || postionTimes.mid.length > 0 || postionTimes.sub.length > 0) {
-             if (player.postionTimeStats.length > 0 || player.postionTimeStats !== undefined || player.postionTimeStats !== '') {
+             //if (player.postionTimeStats.length > 0 || player.postionTimeStats !== undefined || player.postionTimeStats !== '') {
+             if (Array.isArray(player.postionTimeStats) && player.postionTimeStats.length > 0) {
                try {
                player.postionTimeStats.push({gameId: games[0].id, season: currentSeason,  seasonName: currentSeasonName, posTimes: postionTimes})
                }
@@ -715,7 +717,10 @@ try {
     const gameIdData = {gameIdDb: gameIdDbNew, status: 6, teamId: teamId, gameId: gameId, seasonId: seasonIdNew, gameData: {homeTeamName: homeTeamName, awayTeamName: awayTeamName, homeTeamShort: homeTeamShortName, awayTeamShort: awayTeamShortName, homeTeamScore: homeTeamScore, awayTeamScore: awayTeamScore, gameDate: gameDate, gameHalfTime: gameHalfTimeTime, awayTeamId: awayTeamId}, season: {season: seasonNameNew, id: seasonIdNew, gameComplete: true}}
 
     //gameIds.push(gameIdData)
-    gameIds[gameIds.length-1] = gameIdData;
+    //gameIds[gameIds.length-1] = gameIdData;
+    if (teammIndex !== -1 && Array.isArray(teamNames[teammIndex].gameIds)) {
+      teamNames[teammIndex].gameIds[teamNames[teammIndex].gameIds.length - 1] = gameIdData;
+    }
 
 
       firestore().collection(teamId).doc(teamId).update({

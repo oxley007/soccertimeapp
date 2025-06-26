@@ -35,6 +35,8 @@ import checkSortIap from './checkSortIap'
 import fromContinueGame from './fromContinueGame'
 import subSuggestions from './subSuggestions'
 import aiTokens from './aiTokens'
+import showLiveToggle from './showLiveToggle'
+import assignedIds from './assignedIds'
 
 export default combineReducers({
   games,
@@ -71,4 +73,6 @@ export default combineReducers({
   fromContinueGame,
   subSuggestions,
   aiTokens,
+  showLiveToggle,
+  assignedIds,
 });

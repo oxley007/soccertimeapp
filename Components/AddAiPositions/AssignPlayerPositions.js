@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Component, useRef } from 'react'
 import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, TouchableHighlight, ImageBackground, Alert, Image, PixelRatio, FlatList, Dimensions } from 'react-native'
-import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, Icon, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, HStack, VStack, Select, CheckIcon } from 'native-base';
+import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, Row, Col, Icon, H3, H2, Footer, Picker, Form, Button, Center, Heading, Box, HStack, VStack, Select, CheckIcon, Spinner } from 'native-base';
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -38,6 +38,7 @@ import { updateSortIndex } from '../../Reducers/sortIndex';
 import { updateEventsVersion } from '../../Reducers/eventsVersion';
 import { updateSubSuggestions } from '../../Reducers/subSuggestions';
 import { updateAiTokens } from '../../Reducers/aiTokens';
+import { updateAssignedIds } from '../../Reducers/assignedIds';
 
 
 const AssignPlayerPositions = (props)=>{
@@ -52,7 +53,7 @@ const AssignPlayerPositions = (props)=>{
   const [aiMessage, setAiMessage] = useState('');
   const [result, setResult] = useState({});
   const [liveAssignmentsState, setLiveAssignmentsState] = useState({});
-
+  const [explanationMessages, setExplanationMessages] = useState({});
 
 
   //let teamNames = useSelector(state => state.teamNames.teamNames);
@@ -83,6 +84,8 @@ const AssignPlayerPositions = (props)=>{
     (state: RootState) => state.subSuggestions.liveSubSuggestions
   );
   let aiTokens = useSelector(state => state.aiTokens.aiTokens);
+  let showLiveToggle = useSelector(state => state.showLiveToggle.showLiveToggle);
+  let assignedIds = useSelector(state => state.assignedIds.assignedIds);
 
 
   const dispatch = useDispatch()
@@ -192,7 +195,9 @@ const AssignPlayerPositions = (props)=>{
 
   },[aiTokens, pro_forever_indiv[0].purchased, pro_yearly_indiv[0].purchased, pro_yearly_team[0].purchased, pro_forever_team[0].purchased, pro_yearly_player[0].purchased, pro_forever_player[0].purchased])
 
-
+  useEffect(() => {
+    console.log(assignedIds.join(',') + ' assignedIds check (updated)');
+  }, [assignedIds]);
 
   /*
   const showAiSubsAlert = () => {
@@ -558,9 +563,10 @@ const AssignPlayerPositions = (props)=>{
   const assignPlayersByLiveStats = (totalGameTime = sixtySecondsMark) => {
     const liveAssignments = {};
 
-    const getMostPlayedPosition = (breakdown) => {
-      // If sub % is significant (e.g., > 20%), consider player a sub
-      if (breakdown.sub > 20) return 'sub';
+
+
+    const getMostPlayedPosition = (breakdown, currentPosition) => {
+      if (currentPosition === 'sub') return 'sub';  // <-- also check sub %
 
       let topPosition = 'sub';
       let highest = 0;
@@ -571,9 +577,80 @@ const AssignPlayerPositions = (props)=>{
           topPosition = pos;
         }
       }
+      return topPosition;
+    };
+
+
+
+    /*
+    const getMostPlayedPosition = (breakdown) => {
+      let topPosition = 'sub';
+      let highest = 0;
+
+      for (const [pos, percent] of Object.entries(breakdown)) {
+        if (
+          percent > highest ||
+          (percent === highest && pos !== 'sub' && topPosition === 'sub')
+        ) {
+          highest = percent;
+          topPosition = pos;
+        }
+      }
 
       return topPosition;
     };
+    */
+
+    /*
+    const getMostPlayedPosition = (breakdown) => {
+      // If sub % is significant (e.g., > 20%), consider player a sub immediately
+      if (breakdown.sub > 20) return 'sub';
+
+      let topPosition = 'sub';
+      let highest = 0;
+
+      for (const [pos, percent] of Object.entries(breakdown)) {
+        if (
+          percent > highest ||
+          (percent === highest && pos !== 'sub' && topPosition === 'sub')
+        ) {
+          highest = percent;
+          topPosition = pos;
+        }
+      }
+
+      return topPosition;
+    };
+    */
+
+    /*
+    const getMostPlayedPosition = (breakdown) => {
+      // If sub % is significant, return 'sub' immediately
+      if (breakdown.sub > 20) return 'sub';
+
+      let topPosition = 'sub';
+      let highest = 0;
+
+      for (const [pos, percent] of Object.entries(breakdown)) {
+        // Skip if pos is 'sub' because already handled
+        if (pos === 'sub') continue;
+
+        // If percent is greater than current highest, pick it
+        if (percent > highest) {
+          highest = percent;
+          topPosition = pos;
+        }
+        // If tie and current top is 'sub', pick this pos instead
+        else if (percent === highest && topPosition === 'sub') {
+          topPosition = pos;
+        }
+      }
+
+      return topPosition;
+    };
+    */
+
+
 
     playerLiveStats.forEach((player) => {
       const {
@@ -596,7 +673,16 @@ const AssignPlayerPositions = (props)=>{
         sub: percent(subTime),
       };
 
-      const assignedPosition = getMostPlayedPosition(breakdown);
+      console.log('player her heyslkj ' + JSON.stringify(player));
+      //const assignedPosition = getMostPlayedPosition(breakdown);
+      /*const assignedPosition = player.currentPosition === 'sub'
+        ? 'sub'
+        : getMostPlayedPosition(breakdown);*/
+      //const currentPosition = player.currentPosition
+      const currentPosition = player.position || 'sub';
+      const assignedPosition = getMostPlayedPosition(breakdown, currentPosition);
+
+
 
       liveAssignments[player.playerId] = {
         playerId: player.playerId,
@@ -630,7 +716,7 @@ const AssignPlayerPositions = (props)=>{
     return Math.round(totalSeconds / 60);
   };
 
-
+/*
   function getSuggestedSubChanges(assignments, checkTimePlayed = false) {
     if (!Array.isArray(games[0].teamPlayers)) {
       console.warn('teamPlayers is not defined or not an array');
@@ -718,6 +804,477 @@ const AssignPlayerPositions = (props)=>{
 
     return suggestions;
   }
+*/
+
+/*
+function getSuggestedSubChanges(assignments, checkTimePlayed = false) {
+  if (!Array.isArray(games[0].teamPlayers)) {
+    console.warn('teamPlayers is not defined or not an array');
+    return [];
+  }
+
+  const playerMap = games[0].teamPlayers.reduce((acc, p) => {
+    acc[p.playerId] = p;
+    return acc;
+  }, {});
+
+  const onFieldPlayers = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    return (
+      p.assignedPosition !== 'sub' &&
+      p.assignedPosition !== 'gol' &&
+      live?.currentPosition !== 'sub'
+    );
+  });
+
+  const subs = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    return p.assignedPosition === 'sub' && live?.currentPosition === 'sub';
+  });
+
+  console.log("On-field players:", onFieldPlayers.map(p => p.playerName));
+  console.log("Subs:", subs.map(p => p.playerName));
+
+  const suggestions = [];
+  const alreadySuggestedFieldPlayerIds = new Set();
+  const alreadySuggestedSubIds = new Set();
+
+  const sortedFieldPlayers = onFieldPlayers.slice().sort((a, b) => {
+    return getLiveTimePlayedMinutes(b.playerId) - getLiveTimePlayedMinutes(a.playerId);
+  });
+
+  // 🔸 Count overused positions (100% time in same position)
+  const overusedPositionCounts = {};
+  for (const player of sortedFieldPlayers) {
+    const pos = player.assignedPosition;
+    const breakdown = assignments[player.playerId]?.breakdown || {};
+    const percent = breakdown[pos] || 0;
+    if (percent === 100) {
+      overusedPositionCounts[pos] = (overusedPositionCounts[pos] || 0) + 1;
+    }
+  }
+  console.log("Overused Position Counts:", overusedPositionCounts);
+
+  for (const sub of subs) {
+    if (alreadySuggestedSubIds.has(sub.playerId)) continue;
+
+    const subData = playerMap[sub.playerId];
+    if (!subData) continue;
+
+    // 🔸 Sort eligible positions by overuse
+    const eligiblePositions = Object.entries(subData.playerPositions || {})
+      .filter(([pos, isEligible]) => isEligible && pos !== 'gol')
+      .map(([pos]) => pos)
+      .sort((a, b) => {
+        const aCount = overusedPositionCounts[a] || 0;
+        const bCount = overusedPositionCounts[b] || 0;
+        return bCount - aCount; // high → low
+      });
+
+    console.log(`\nSub: ${sub.playerName}, Eligible Positions:`, eligiblePositions);
+
+    for (const pos of eligiblePositions) {
+      const possibleFieldPlayers = sortedFieldPlayers.filter(
+        p => p.assignedPosition === pos && !alreadySuggestedFieldPlayerIds.has(p.playerId)
+      );
+
+      console.log(`Checking for position "${pos}" - candidates:`, possibleFieldPlayers.map(p => p.playerName));
+
+      for (const fieldPlayer of possibleFieldPlayers) {
+        const fieldPlayerData = playerMap[fieldPlayer.playerId];
+        if (!fieldPlayerData) continue;
+
+        const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+        const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+        if (checkTimePlayed && subTimePlayed > fieldPlayerTimePlayed) {
+          console.log(`⏩ Skipping: ${sub.playerName} (played ${subTimePlayed}) > ${fieldPlayer.playerName} (${fieldPlayerTimePlayed})`);
+          continue;
+        }
+
+        const subBreakdown = assignments[sub.playerId]?.breakdown || {};
+        const fieldBreakdown = assignments[fieldPlayer.playerId]?.breakdown || {};
+        const subPercent = subBreakdown[pos] || 0;
+        const fieldPercent = fieldBreakdown[pos] || 0;
+
+        console.log(`Comparing ${sub.playerName} (${subPercent}%) vs ${fieldPlayer.playerName} (${fieldPercent}%) in ${pos}`);
+
+        suggestions.push({
+          subName: sub.playerName,
+          subId: sub.playerId,
+          subPercent,
+          breakdown: subBreakdown,
+          positionDetails: sub.positionDetails || {},
+          timePlayed: subTimePlayed,
+
+          fieldPlayerName: fieldPlayer.playerName,
+          fieldPlayerId: fieldPlayer.playerId,
+          fieldPercent,
+          fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+          fieldPlayerTimePlayed,
+
+          position: pos,
+          improvement: fieldPercent - subPercent,
+        });
+
+        alreadySuggestedFieldPlayerIds.add(fieldPlayer.playerId);
+        alreadySuggestedSubIds.add(sub.playerId);
+        console.log(`✅ Suggested: ${sub.playerName} ⟶ ${fieldPlayer.playerName} in ${pos}`);
+        break; // One sub per sub loop
+      }
+
+      if (alreadySuggestedSubIds.has(sub.playerId)) break;
+    }
+  }
+
+  console.log("\nFinal Suggestions:", suggestions);
+  return suggestions;
+}
+*/
+
+/*
+function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed = false) {
+  if (!Array.isArray(games[0].teamPlayers)) {
+    console.warn('teamPlayers is not defined or not an array');
+    return { suggestions: [], assignedIds };
+  }
+
+  const playerMap = games[0].teamPlayers.reduce((acc, p) => {
+    acc[p.playerId] = p;
+    return acc;
+  }, {});
+
+  console.log('All assignments:', Object.values(assignments).map(p => `${p.playerName} (${p.assignedPosition})`));
+
+  const onFieldPlayers = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    const keep = (
+      p.assignedPosition !== 'sub' &&
+      p.assignedPosition !== 'gol' &&
+      live?.currentPosition !== 'sub'
+    );
+    console.log(`OnField check ${p.playerName}:`, keep);
+    return keep;
+  });
+
+  const subs = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    const keep = p.assignedPosition === 'sub' && live?.currentPosition === 'sub';
+    console.log(`Sub check ${p.playerName}:`, keep);
+    return keep;
+  });
+
+  console.log('Filtered On-field players:', onFieldPlayers.map(p => p.playerName));
+  console.log('Filtered Subs:', subs.map(p => p.playerName));
+
+  const suggestions = [];
+  const assignedIdsSet = new Set(assignedIds);
+
+  const sortedFieldPlayers = onFieldPlayers.slice().sort((a, b) => {
+    return getLiveTimePlayedMinutes(b.playerId) - getLiveTimePlayedMinutes(a.playerId);
+  });
+
+  for (const sub of subs) {
+    const subData = playerMap[sub.playerId];
+    if (!subData) {
+      console.log(`No live data for sub ${sub.playerName}`);
+      continue;
+    }
+
+    const eligiblePositions = Object.entries(subData.playerPositions || {})
+      .filter(([pos, isEligible]) => isEligible && pos !== 'gol')
+      .map(([pos]) => pos);
+
+    console.log(`${sub.playerName} eligible positions:`, eligiblePositions);
+
+    if (eligiblePositions.length === 0) continue;
+
+    for (const pos of eligiblePositions) {
+      const candidates = sortedFieldPlayers.filter(
+        p => p.assignedPosition === pos && !assignedIdsSet.has(p.playerId)
+      );
+
+      console.log(`Candidates for position ${pos}:`, candidates.map(p => p.playerName));
+
+      for (const fieldPlayer of candidates) {
+        const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+        const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+        console.log(`Time played - Sub: ${sub.playerName}: ${subTimePlayed} mins, Field: ${fieldPlayer.playerName}: ${fieldPlayerTimePlayed} mins`);
+
+        if (checkTimePlayed && subTimePlayed > fieldPlayerTimePlayed) {
+          console.log(`Skipping ${sub.playerName} because sub time ${subTimePlayed} > field player time ${fieldPlayerTimePlayed}`);
+          continue;
+        }
+
+        const subBreakdown = assignments[sub.playerId]?.breakdown || {};
+        const fieldBreakdown = assignments[fieldPlayer.playerId]?.breakdown || {};
+        const subPercent = subBreakdown[pos] || 0;
+        const fieldPercent = fieldBreakdown[pos] || 0;
+
+        console.log(`Comparing experience for ${pos}: Sub ${sub.playerName} ${subPercent}% vs Field ${fieldPlayer.playerName} ${fieldPercent}%`);
+
+        suggestions.push({
+          subName: sub.playerName,
+          subId: sub.playerId,
+          subPercent,
+          breakdown: subBreakdown,
+          positionDetails: sub.positionDetails || {},
+          timePlayed: subTimePlayed,
+
+          fieldPlayerName: fieldPlayer.playerName,
+          fieldPlayerId: fieldPlayer.playerId,
+          fieldPercent,
+          fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+          fieldPlayerTimePlayed,
+
+          position: pos,
+          improvement: fieldPercent - subPercent,
+        });
+
+        assignedIdsSet.add(fieldPlayer.playerId);
+
+        break; // move to next sub after one suggestion
+      }
+
+      if (suggestions.find(s => s.subId === sub.playerId)) break;
+    }
+  }
+
+  console.log('Suggestions:', suggestions);
+  console.log('Assigned IDs after suggestions:', Array.from(assignedIdsSet));
+
+  return {
+    suggestions,
+    assignedIds: Array.from(assignedIdsSet),
+  };
+}
+*/
+
+function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed = false) {
+
+  let assignedIdsSet = new Set();
+
+  if (!Array.isArray(games[0].teamPlayers)) {
+    console.warn('teamPlayers is not defined or not an array');
+    return { suggestions: [], assignedIds, explanationMessages: {} };
+  }
+
+  const playerMap = games[0].teamPlayers.reduce((acc, p) => {
+    acc[p.playerId] = p;
+    return acc;
+  }, {});
+
+  console.log('All assignments:', Object.values(assignments).map(p => `${p.playerName} (${p.assignedPosition})`));
+
+  const onFieldPlayers = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    const keep = (
+      p.assignedPosition !== 'sub' &&
+      p.assignedPosition !== 'gol' &&
+      live?.currentPosition !== 'sub'
+    );
+    console.log(`OnField check ${p.playerName}:`, keep);
+    return keep;
+  });
+
+  /*
+  const subs = Object.values(assignments).filter(p => {
+    const live = playerMap[p.playerId];
+    const keep = p.assignedPosition === 'sub' && live?.currentPosition === 'sub';
+    console.log(`Sub check ${p.playerName}:`, keep);
+    return keep;
+  });
+  */
+
+  const subs = Object.values(assignments).filter(p => {
+    console.log('Sophie currentPosition:', playerMap['SA936Q']?.currentPosition);
+    const live = playerMap[p.playerId];
+    const keep = p.assignedPosition === 'sub';  // <-- no live currentPosition check
+    console.log(`Sub check ${p.playerName}:`, keep);
+    return keep;
+  });
+
+
+  console.log('Filtered On-field players:', onFieldPlayers.map(p => p.playerName));
+  console.log('Filtered Subs:', subs.map(p => p.playerName));
+
+  const suggestions = [];
+  //assignedIdsSet = new Set(assignedIds);
+  const explanationMessages = {};  // Store messages keyed by subId
+
+  const sortedFieldPlayers = onFieldPlayers.slice().sort((a, b) => {
+    return getLiveTimePlayedMinutes(b.playerId) - getLiveTimePlayedMinutes(a.playerId);
+  });
+
+  for (const sub of subs) {
+    explanationMessages[sub.playerId] = [];
+
+    const subData = playerMap[sub.playerId];
+    if (!subData) {
+      console.log(`No live data for sub ${sub.playerName}`);
+      explanationMessages[sub.playerId].push("No live player data available.");
+      continue;
+    }
+
+    const eligiblePositions = Object.entries(subData.playerPositions || {})
+      .filter(([pos, isEligible]) => isEligible && pos !== 'gol')
+      .map(([pos]) => pos);
+
+    console.log(`${sub.playerName} eligible positions:`, eligiblePositions);
+
+    if (eligiblePositions.length === 0) {
+      explanationMessages[sub.playerId].push(`${sub.playerName} has no eligible positions.`);
+      continue;
+    }
+
+    let subSuggested = false;
+
+    for (const pos of eligiblePositions) {
+      const candidates = sortedFieldPlayers.filter(
+        p => p.assignedPosition === pos && !assignedIdsSet.has(p.playerId)
+      );
+
+      console.log(`Candidates for position ${pos}:`, candidates.map(p => p.playerName));
+
+      if (candidates.length === 0) {
+        explanationMessages[sub.playerId].push(`${sub.playerName} No on-field players available at position "${pos}".`);
+        continue;
+      }
+
+      for (const fieldPlayer of candidates) {
+        const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+        const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+        console.log(`Time played - Sub: ${sub.playerName}: ${subTimePlayed} mins, Field: ${fieldPlayer.playerName}: ${fieldPlayerTimePlayed} mins`);
+
+        if (checkTimePlayed && subTimePlayed > fieldPlayerTimePlayed) {
+          explanationMessages[sub.playerId].push(
+            `Played more (${subTimePlayed}min) than ${fieldPlayer.playerName} (${fieldPlayerTimePlayed}min) at position "${pos}".`
+          );
+          continue;
+        }
+
+        const subBreakdown = assignments[sub.playerId]?.breakdown || {};
+        const fieldBreakdown = assignments[fieldPlayer.playerId]?.breakdown || {};
+        const subPercent = subBreakdown[pos] || 0;
+        const fieldPercent = fieldBreakdown[pos] || 0;
+
+        console.log(`Comparing experience for ${pos}: Sub ${sub.playerName} ${subPercent}% vs Field ${fieldPlayer.playerName} ${fieldPercent}%`);
+
+        suggestions.push({
+          subName: sub.playerName,
+          subId: sub.playerId,
+          subPercent,
+          breakdown: subBreakdown,
+          positionDetails: sub.positionDetails || {},
+          timePlayed: subTimePlayed,
+
+          fieldPlayerName: fieldPlayer.playerName,
+          fieldPlayerId: fieldPlayer.playerId,
+          fieldPercent,
+          fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+          fieldPlayerTimePlayed,
+
+          position: pos,
+          improvement: fieldPercent - subPercent,
+        });
+
+        assignedIdsSet.add(fieldPlayer.playerId);
+        subSuggested = true;
+        break; // move to next sub after one suggestion
+      }
+
+      if (subSuggested) break;
+    }
+
+    if (!subSuggested) {
+      explanationMessages[sub.playerId].push(`${sub.playerName} No suitable substitution found.`);
+    }
+  }
+
+  console.log('Suggestions:', suggestions);
+  console.log('Assigned IDs after suggestions:', Array.from(assignedIdsSet));
+  console.log('Explanation Messages:', explanationMessages);
+
+  return {
+    suggestions,
+    assignedIds: Array.from(assignedIdsSet),
+    explanationMessages,
+  };
+}
+
+
+
+
+  function getSeasonSuggestedSubChanges(assignments) {
+    const suggestions = [];
+
+    const subs = Object.values(assignments).filter(p => p.assignedPosition === 'sub');
+    const onFieldPlayers = Object.values(assignments).filter(p => p.assignedPosition !== 'sub');
+
+    console.log('Subs:', subs.map(s => s.playerName));
+    console.log('On-field:', onFieldPlayers.map(p => `${p.playerName} (${p.assignedPosition})`));
+
+    for (const sub of subs) {
+      const sortedPositions = Object.entries(sub.breakdown)
+        .filter(([pos]) => pos !== 'sub')
+        .sort((a, b) => a[1] - b[1])
+        .map(([pos]) => pos);
+
+      console.log(`Checking sub: ${sub.playerName} eligible positions:`, sortedPositions);
+
+      let suggestedSwap = null;
+
+      for (const subPosition of sortedPositions) {
+        if (sub.breakdown[subPosition] === 0) {
+          console.log(`Skipping position ${subPosition} for sub ${sub.playerName} (0%)`);
+          continue;
+        }
+
+        const onFieldPlayersInPosition = onFieldPlayers.filter(p => p.assignedPosition === subPosition);
+        if (onFieldPlayersInPosition.length === 0) {
+          console.log(`No on-field players at position ${subPosition}`);
+          continue;
+        }
+
+        const candidateOnField = onFieldPlayersInPosition.reduce((best, curr) =>
+          curr.breakdown[subPosition] < best.breakdown[subPosition] ? curr : best
+        );
+
+
+
+        console.log(`Comparing sub ${sub.playerName} (${sub.breakdown[subPosition]}%) with on-field ${candidateOnField.playerName} (${candidateOnField.breakdown[subPosition]}%) at position ${subPosition}`);
+
+        if (sub.breakdown[subPosition] > candidateOnField.breakdown[subPosition]) {
+          suggestedSwap = {
+            subId: sub.playerId,
+            subName: sub.playerName,
+            position: subPosition,
+            breakdown: sub.breakdown,
+            timePlayed: sub.timePlayed || 0,
+
+            fieldPlayerId: candidateOnField.playerId,
+            fieldPlayerName: candidateOnField.playerName,
+            fieldPlayerPosition: candidateOnField.assignedPosition,
+            fieldPlayerBreakdown: candidateOnField.breakdown,
+            fieldPlayerTimePlayed: candidateOnField.timePlayed || 0,
+          };
+          console.log('Suggested swap:', suggestedSwap);
+          break;
+        } else {
+          console.log(`No swap: sub has equal or higher % at ${subPosition}`);
+        }
+      }
+
+      if (suggestedSwap) {
+        suggestions.push(suggestedSwap);
+      }
+    }
+
+    console.log('Final suggestions:', suggestions);
+    return suggestions;
+  }
 
 
 
@@ -725,6 +1282,10 @@ const AssignPlayerPositions = (props)=>{
 
 
   const callSubsSort = () => {
+
+    dispatch(updateAssignedIds([])); // ✅ Pass an empty array to clear it
+    setExplanationMessages([])
+    console.log('assignedIds cleared');
 
     const purchases = [
       pro_forever_indiv[0].purchased,
@@ -763,32 +1324,70 @@ const AssignPlayerPositions = (props)=>{
       console.log('teamPlayers ' + JSON.stringify(teamPlayers));
       console.log('games[0].teamPlayers on button click ' + JSON.stringify(games[0].teamPlayers));
 
-      const seasonAssignments = assignPlayersByMatchFormat(); // original
+      //const seasonAssignments = assignPlayersByMatchFormat(); // original
+      const [seasonAssignments, liveAssignmentsRaw] = assignPlayersByMatchFormat(0);
       const liveAssignments = assignPlayersByLiveStats(); // new
 
       console.log('assignments (season) ' + JSON.stringify(seasonAssignments));
       console.log('assignments (live). ' + JSON.stringify(liveAssignments));
 
-      const subSuggestions = getSuggestedSubChanges(seasonAssignments);
-      const liveSubSuggestions = getSuggestedSubChanges(liveAssignments, true);
+      //const subSuggestions = getSuggestedSubChanges(seasonAssignments);
+      //const liveSubSuggestions = getSuggestedSubChanges(liveAssignments, true);
+
+      //const subSuggestions = getSeasonSuggestedSubChanges(seasonAssignments); // season logic
+      /*
+      const subSuggestions = Array.isArray(seasonAssignments)
+        ? getSeasonSuggestedSubChanges(seasonAssignments[0])
+        : getSeasonSuggestedSubChanges(seasonAssignments);
+        */
+
+      // seasonAssignments is [assignments, liveAssignments]
+      const seasonAssignmentObject = Array.isArray(seasonAssignments) ? seasonAssignments[0] : seasonAssignments;
+      console.log('seasonAssignmentObject:', seasonAssignmentObject);
+
+      const seasonAssignmentArray = Object.values(seasonAssignmentObject);  // <-- convert object values to array
+
+      const subSuggestions = getSeasonSuggestedSubChanges(seasonAssignmentArray);  // pass array instead of object
+
+
+
+      //const liveSubSuggestions = getSuggestedSubChanges(liveAssignments, true); // live logic
+      //const { suggestions: liveSubSuggestions, assignedIds: newAssignedIds } = getSuggestedSubChanges(liveAssignments, assignedIds, true);
+      const {
+        suggestions: liveSubSuggestions,
+        assignedIds: newAssignedIds,
+        explanationMessages: liveExplanationMessages
+      } = getSuggestedSubChanges(liveAssignments, assignedIds, true);
+
+      console.log('Explanation Messages 2:', liveExplanationMessages);
+      dispatch(updateAssignedIds(newAssignedIds));
+      // Set messages and clear after 10 seconds
+      setExplanationMessages(liveExplanationMessages);
+
+      setTimeout(() => {
+        setExplanationMessages({});
+      }, 10000); // 10000 ms = 10 seconds
+
+      const suggestions = showLiveToggle ? liveSubSuggestions : subSuggestions;
+
 
       console.log('liveSubSuggestions (live) ' + JSON.stringify(liveSubSuggestions));
+      console.log('subSuggestions (season) ' + JSON.stringify(subSuggestions));
 
-      // Check if suggestions exist
-      const hasSuggestions =
-      (subSuggestions && subSuggestions.length > 0) ||
-      (liveSubSuggestions && liveSubSuggestions.length > 0);
+      // Check if the relevant suggestions exist
+      const hasActiveSuggestions = showLiveToggle
+        ? liveSubSuggestions && liveSubSuggestions.length > 0
+        : subSuggestions && subSuggestions.length > 0;
 
-      if (hasSuggestions) {
+      if (hasActiveSuggestions) {
         dispatch(updateSubSuggestions(subSuggestions, liveSubSuggestions));
-        const aiTokensTotal = aiTokens - 1;
-        dispatch(updateAiTokens(aiTokensTotal));
-        setAiMessage(''); // Clear message if there was one previously
+        dispatch(updateAiTokens(aiTokens - 1));
+        setAiMessage(''); // Clear previous AI message
       } else {
         setAiMessage('AI has no substitution suggestions right now — all players are currently well-balanced.');
         setTimeout(() => {
           setAiMessage('');
-        }, 10000); // 10,000 milliseconds = 10 seconds
+        }, 10000); // 10 seconds
       }
     }
 
@@ -809,54 +1408,54 @@ const AssignPlayerPositions = (props)=>{
   const callPlayerSort = () => {
 
     setLoading(true);
+    console.log('AI sorting triggered');
+
+    // Simulate 4 seconds of work
+    setTimeout(() => {
+      setLoading(false);
+      console.log('Done sorting');
+    }, 4000);
+
+    setIsPulsing(false); // stop the animation
     console.log('we getting a hit here?');
+    const assignments = assignPlayersByMatchFormat()[0]; // ✅ Grabs the first item directly
 
-    try {
-      setIsPulsing(false); // stop the animation
-      console.log('we getting a hit here?');
-      const assignments = assignPlayersByMatchFormat()[0]; // ✅ Grabs the first item directly
+    const _games = [...games]; // create local copy
+    const teamPlayers = _games[0].teamPlayers;
 
-      const _games = [...games]; // create local copy
-      const teamPlayers = _games[0].teamPlayers;
-
-      if (teamPlayers && teamPlayers.length > 0) {
-        teamPlayers.forEach((player, index) => {
-          const assigned = assignments[player.playerId];
-          if (assigned) {
-            teamPlayers[index] = {
-              ...player,
-              currentPosition: assigned.assignedPosition,
-              positionDetails: {
-                ...player.positionDetails,
-                ...(assigned.positionDetails || {}),
-              },
-            };
-          }
-        });
-
-        console.log('we getting a hit here? 2');
-        const updatedEventsVersion = eventsVersion + 1;
-
-        dispatch(updateGames(_games));
-        dispatch(updateEventsVersion(updatedEventsVersion));
-
-        const teamIdCodeGames = _games[0].teamIdCode;
-        const gameIdDb = _games[0].gameIdDb;
-
-        firestore()
-          .collection(teamIdCodeGames)
-          .doc(gameIdDb)
-          .set({ game: _games[0] }, { merge: true });
-
-        userRef
-          .doc(gameIdDb)
-          .set({ game: _games[0] }, { merge: true });
-      }
-    } catch (error) {
-          console.error('Error in callPlayerSort:', error);
-        } finally {
-          setLoading(false); // stop loading spinner
+    if (teamPlayers && teamPlayers.length > 0) {
+      teamPlayers.forEach((player, index) => {
+        const assigned = assignments[player.playerId];
+        if (assigned) {
+          teamPlayers[index] = {
+            ...player,
+            currentPosition: assigned.assignedPosition,
+            positionDetails: {
+              ...player.positionDetails,
+              ...(assigned.positionDetails || {}),
+            },
+          };
         }
+      });
+
+      console.log('we getting a hit here? 2');
+      const updatedEventsVersion = eventsVersion + 1;
+
+      dispatch(updateGames(_games));
+      dispatch(updateEventsVersion(updatedEventsVersion));
+
+      const teamIdCodeGames = _games[0].teamIdCode;
+      const gameIdDb = _games[0].gameIdDb;
+
+      firestore()
+        .collection(teamIdCodeGames)
+        .doc(gameIdDb)
+        .set({ game: _games[0] }, { merge: true });
+
+      userRef
+        .doc(gameIdDb)
+        .set({ game: _games[0] }, { merge: true });
+    }
 
   }
 
@@ -978,19 +1577,19 @@ const AssignPlayerPositions = (props)=>{
               <View>
                 <HStack alignItems="center" pb="3" shadow={6}>
                   <Animated.View style={[animatedStyle]}>
-                      <Button
-                        minW="100%"
-                        bg="#E879F9"
-                        size="md"
-                        _text={{ fontSize: 22, color: '#fff' }}
-                        variant="subtle"
-                        onPress={callPlayerSort}
-                        borderRadius={6}
-                        isDisabled={loading}
-                        leftIcon={loading ? <Spinner color="white" size="sm" /> : null}
-                      >
-                        {loading ? 'Sorting...' : 'Auto Sort Positions with AI'}
-                      </Button>
+                    <Button
+                      minW="100%"
+                      bg="#E879F9"
+                      size="md"
+                      _text={{ fontSize: 22, color: '#fff' }}
+                      variant="subtle"
+                      onPress={callPlayerSort}
+                      borderRadius={6}
+                      isDisabled={loading}
+                      leftIcon={loading ? <Spinner color="white" size="sm" /> : null}
+                    >
+                      {loading ? 'Sorting...' : 'Auto Sort Positions with AI'}
+                    </Button>
                     </Animated.View>
                   </HStack>
                   {isPulsing === true &&
@@ -1053,36 +1652,18 @@ const AssignPlayerPositions = (props)=>{
                 <SubSuggestions navigation={props.navigation} />
               </View>
             }
-            <View style={{ padding: 16 }}>
-                  <Button title="Compare Subs to Field Players" onPress={handleClick}>
-                    <Text>Compare Subs to Field Players</Text>
-                  </Button>
-                  <ScrollView style={{ marginTop: 16, maxHeight: 500 }}>
-                  {Object.entries(result).map(([subId, data]) => (
-                    <View key={subId} style={{ marginBottom: 20, padding: 10, backgroundColor: '#f2f2f2' }}>
-                      <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                        Sub: {data.subName} ({subId})
-                      </Text>
-                      <Text style={{ fontStyle: 'italic', marginBottom: 6 }}>
-                        Eligible positions: {(data.subEligiblePositions || []).join(', ')}
-                      </Text>
-
-                      {data.higherFieldPlayers.length === 0 ? (
-                        <Text style={{ color: 'gray' }}>No field players with higher %</Text>
-                      ) : (
-                        data.higherFieldPlayers.map((fieldPlayer, idx) => (
-                          <View key={fieldPlayer.playerId + idx} style={{ marginTop: 8, padding: 6, backgroundColor: '#fff', borderRadius: 6 }}>
-                            <Text>{fieldPlayer.playerName} ({fieldPlayer.playerId})</Text>
-                            <Text>Playing as: {fieldPlayer.position}</Text>
-                            <Text>Total %: {fieldPlayer.totalPercent}</Text>
-                            <Text>Eligible for: {fieldPlayer.eligiblePositions.join(', ')}</Text>
-                          </View>
-                        ))
-                      )}
+            <View>
+                  {Object.entries(explanationMessages).map(([subId, messages]) => (
+                    <View key={subId} style={{ marginBottom: 16 }}>
+                      {messages.map((msg, index) => (
+                        <Text key={index} style={{ marginLeft: 8, color: '#999' }}>
+                          • {msg}
+                        </Text>
+                      ))}
                     </View>
                   ))}
-                  </ScrollView>
                 </View>
+
         </View>
         )
     }
@@ -1286,3 +1867,37 @@ console.log(positionAssignments);
 </HStack>
 <Text style={styles.name}>{JSON.stringify(combinedPlayerStats)}...</Text>
 */
+
+/*
+<View style={{ padding: 16 }}>
+      <Button title="Compare Subs to Field Players" onPress={handleClick}>
+        <Text>Compare Subs to Field Players</Text>
+      </Button>
+      <ScrollView style={{ marginTop: 16, maxHeight: 500 }}>
+      {Object.entries(result).map(([subId, data]) => (
+        <View key={subId} style={{ marginBottom: 20, padding: 10, backgroundColor: '#f2f2f2' }}>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+            Sub: {data.subName} ({subId})
+          </Text>
+          <Text style={{ fontStyle: 'italic', marginBottom: 6 }}>
+            Eligible positions: {(data.subEligiblePositions || []).join(', ')}
+          </Text>
+
+          {data.higherFieldPlayers.length === 0 ? (
+            <Text style={{ color: 'gray' }}>No field players with higher %</Text>
+          ) : (
+            data.higherFieldPlayers.map((fieldPlayer, idx) => (
+              <View key={fieldPlayer.playerId + idx} style={{ marginTop: 8, padding: 6, backgroundColor: '#fff', borderRadius: 6 }}>
+                <Text>{fieldPlayer.playerName} ({fieldPlayer.playerId})</Text>
+                <Text>Playing as: {fieldPlayer.position}</Text>
+                <Text>Total %: {fieldPlayer.totalPercent}</Text>
+                <Text>Eligible for: {fieldPlayer.eligiblePositions.join(', ')}</Text>
+              </View>
+            ))
+          )}
+        </View>
+      ))}
+      </ScrollView>
+    </View>
+
+    */

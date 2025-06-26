@@ -2224,10 +2224,17 @@ catch {
 		console.log(getLatestId + ' getLatestId')
 		console.log(playerIndex + ' playerIndex')
 
+		const showAssignPlayerPositions = games?.[0]?.teamPlayers?.every(
+		  player => !!player.playerPositions
+		) ?? false;
+
+
 
 		return (
 			<Box>
-			<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+			{showAssignPlayerPositions && (
+				<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+			)}
 			<PositionSortNew playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
 			</Box>
 		)
@@ -2243,10 +2250,17 @@ catch {
 		console.log(playerIndex + ' playerIndex')
 		*/
 
+		const showAssignPlayerPositions = games?.[0]?.teamPlayers?.every(
+		  player => !!player.playerPositions
+		) ?? false;
+
+
 		return (
 			<Box>
 				<Text syle={{color: '#fff'}}>hiya!</Text>
-				<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+				{showAssignPlayerPositions && (
+					<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
+				)}
 			</Box>
 		)
 

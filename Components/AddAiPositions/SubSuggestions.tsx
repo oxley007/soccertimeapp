@@ -17,6 +17,8 @@ import AssignPlayerPositions from './AssignPlayerPositions'
 import { updateSubSuggestions } from '../../Reducers/subSuggestions';
 import { updateGames } from '../../Reducers/games';
 import { updateEventsVersion } from '../../Reducers/eventsVersion';
+import { updateShowLiveToggle } from '../../Reducers/showLiveToggle';
+import { updateAssignedIds } from '../../Reducers/assignedIds';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 const swapIcon = <Ionicons name="swap-horizontal" size={18} color="#E879F9" />;
@@ -70,10 +72,11 @@ const SubSuggestions: React.FC<any> = (props) => {
   );
   let eventsVersion = useSelector(state => state.eventsVersion.eventsVersion);
   let games = useSelector(state => state.games.games);
+  let showLiveToggle = useSelector(state => state.showLiveToggle.showLiveToggle);
+  const assignedIds = useSelector(state => state.assignedIds.assignedIds);
 
-
-  const [showLive, setShowLive] = useState<boolean>(true); // Default live ON
-  const activeSuggestions = showLive ? liveSubSuggestions : seasonSubSuggestions;
+  //const [showLive, setShowLive] = useState<boolean>(true); // Default live ON
+  const activeSuggestions = showLiveToggle ? liveSubSuggestions : seasonSubSuggestions;
 
   const { currentUser } = auth()
   const userRef = firestore().collection(currentUser.uid);
@@ -87,6 +90,10 @@ const SubSuggestions: React.FC<any> = (props) => {
   }
 
   const handleMakeSub = (suggestion) => {
+    const handleMakeSub = (suggestion) => {
+      const updatedAssignedIds = assignedIds.filter(id => id !== suggestion.fieldPlayerId);
+      dispatch(updateAssignedIds(updatedAssignedIds));
+    };
     setActiveSubId(suggestion.subId); // Start loading this sub
 
     try {
@@ -168,18 +175,11 @@ const SubSuggestions: React.FC<any> = (props) => {
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#000', borderColor: '#ddd', borderWidth: 1 }}>
 
-      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-        <Text style={{ marginRight: 8, color: '#fff', fontSize: 16, fontWeight: '600' }}>
-          Show Subs based on stats from:
-        </Text>
-      </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-        <Text style={{ marginRight: 8, color: '#fff' }}>Season</Text>
-        <Switch value={showLive} onValueChange={setShowLive} />
-        <Text style={{ marginLeft: 8, color: '#fff' }}>Live Game</Text>
-      </View>
 
+      {showLiveToggle === false &&
+        <Text style={{ marginBottom: 5, color: '#fff', fontSize: 14 }}>When Season is toggled on, substitution suggestions prioritize players who have played fewer minutes in a position, replacing those who have played that position the most.</Text>
+      }
       <View style={{ flexDirection: 'row', marginBottom: 16 }}>
         <Button bg="transparent" p="0" size="md" variant="subtle" onPress={() => clearAiSubs()}>
           <Text style={{ marginRight: 8, color: '#E879F9', textDecorationLine: 'underline', fontSize: 18 }}>
@@ -273,3 +273,21 @@ const SubSuggestions: React.FC<any> = (props) => {
 };
 
 export default SubSuggestions;
+
+
+/*
+swtich logic to add back in
+<View style={{ flexDirection: 'row', marginBottom: 5 }}>
+  <Text style={{ marginRight: 8, color: '#fff', fontSize: 16, fontWeight: '600' }}>
+    Show Subs based on stats from:
+  </Text>
+</View>
+<View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+  <Text style={{ marginRight: 8, color: '#fff' }}>Season</Text>
+  <Switch
+    value={showLiveToggle}
+    onValueChange={(value) => dispatch(updateShowLiveToggle(value))}
+  />
+  <Text style={{ marginLeft: 8, color: '#fff' }}>Live Game</Text>
+</View>
+*/

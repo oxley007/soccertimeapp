@@ -160,6 +160,7 @@ const KickOff = (props)=>{
 
   const startTimer = () => {
 
+
     console.log(JSON.stringify(games[0].teamPlayers) + ' games[0]. checking');
     setHalfTimeCheck(false)
 
@@ -215,6 +216,7 @@ const KickOff = (props)=>{
         games[0].firstHalf = true
         games[0].secondHalf = false
         games[0].halfTime = 1
+        games[0].gameEvents = []
 
         const epochDate = new Date();
         const startTimeEpochDate = Math.floor(new Date(epochDate).getTime() / 1000)
