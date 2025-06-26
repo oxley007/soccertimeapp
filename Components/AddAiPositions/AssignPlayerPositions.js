@@ -650,6 +650,13 @@ const AssignPlayerPositions = (props)=>{
     };
     */
 
+    const teamPlayerMap = {};
+    if (Array.isArray(games[0]?.teamPlayers)) {
+      games[0].teamPlayers.forEach(p => {
+        teamPlayerMap[p.playerId] = p;
+      });
+    }
+
 
 
     playerLiveStats.forEach((player) => {
@@ -682,7 +689,8 @@ const AssignPlayerPositions = (props)=>{
       const currentPosition = player.position || 'sub';
       const assignedPosition = getMostPlayedPosition(breakdown, currentPosition);
 
-
+      const teamPlayer = teamPlayerMap[player.playerId];
+      const playerPositions = teamPlayer?.playerPositions || {};  // fallback to empty object if not found
 
       liveAssignments[player.playerId] = {
         playerId: player.playerId,
@@ -693,6 +701,7 @@ const AssignPlayerPositions = (props)=>{
         positionDetails: {
           ...player.positionDetails,
         },
+        playerPositions,  // ✅ Now included
       };
     });
 
@@ -1205,6 +1214,164 @@ function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed =
 }
 
 
+function getFieldPlayersWithTotalTime(fieldPlayers) {
+  const allFieldPlayers = [
+    ...fieldPlayers.def,
+    ...fieldPlayers.mid,
+    ...fieldPlayers.fwd,
+  ];
+
+  // Map each player to an object containing player + totalFieldTime
+  const playersWithTotalTime = allFieldPlayers.map(player => {
+    const b = player.breakdown || {};
+    const totalFieldTime = (b.fwd || 0) + (b.mid || 0) + (b.def || 0);
+
+    return {
+      ...player,           // full player data
+      totalFieldTime,      // add total field time
+    };
+  });
+
+  // Sort descending by totalFieldTime
+  playersWithTotalTime.sort((a, b) => b.totalFieldTime - a.totalFieldTime);
+
+  return playersWithTotalTime;
+}
+
+function getSortedSubsBySubTime(subs) {
+  // Create array with full player data + total 'sub' time
+  const sortedSubs = subs
+    .map((player) => ({
+      ...player,
+      totalSubTime: Number(player.breakdown.sub || 0),
+    }))
+    .sort((a, b) => b.totalSubTime - a.totalSubTime); // highest 'sub' time first
+
+  return sortedSubs;
+}
+
+function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
+  const suggestions = [];
+  const matchedFieldPlayerIds = new Set();
+
+  sortedSubs.forEach(sub => {
+    const subBreakdown = sub.breakdown || {};
+    const subPercent =
+      (subBreakdown.fwd || 0) +
+      (subBreakdown.mid || 0) +
+      (subBreakdown.def || 0);
+    //const subTimePlayed = subBreakdown.sub || 0;
+
+    // Only keep positions with `true`
+    const subValidPositions = Object.entries(sub.playerPositions || {})
+      .filter(([_, value]) => value)
+      .reduce((acc, [key, _]) => {
+        acc[key] = true;
+        return acc;
+      }, {});
+
+    for (let i = 0; i < sortedFieldPlayers.length; i++) {
+      const fieldPlayer = sortedFieldPlayers[i];
+      const pos = fieldPlayer.assignedPosition;
+
+      const canPlayPosition = sub.playerPositions?.[pos];
+      if (!canPlayPosition || matchedFieldPlayerIds.has(fieldPlayer.playerId)) continue;
+
+      const fieldBreakdown = fieldPlayer.breakdown || {};
+      const fieldPercent = fieldBreakdown[pos] || 0;
+      /*const fieldPlayerTimePlayed =
+        (fieldBreakdown.fwd || 0) +
+        (fieldBreakdown.mid || 0) +
+        (fieldBreakdown.def || 0);*/
+
+      const fieldValidPositions = Object.entries(fieldPlayer.playerPositions || {})
+        .filter(([_, value]) => value)
+        .reduce((acc, [key, _]) => {
+          acc[key] = true;
+          return acc;
+        }, {});
+
+      const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+      const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+      suggestions.push({
+        subName: sub.playerName,
+        subId: sub.playerId,
+        subPercent,
+        breakdown: subBreakdown,
+        positionDetails: sub.positionDetails || {},
+        timePlayed: subTimePlayed,
+        validPositions: subValidPositions,
+
+        fieldPlayerName: fieldPlayer.playerName,
+        fieldPlayerId: fieldPlayer.playerId,
+        fieldPercent,
+        fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+        fieldPlayerTimePlayed,
+        fieldValidPositions,
+
+        position: pos,
+        improvement: fieldPercent - subPercent,
+      });
+
+      matchedFieldPlayerIds.add(fieldPlayer.playerId);
+      break; // move to next sub
+    }
+  });
+
+  return suggestions;
+}
+
+
+function getSuggestedSubChangesNew(assignments) {
+  let subs = [];
+  const fieldPlayers = {
+    def: [],
+    mid: [],
+    fwd: [],
+  };
+
+  const getTotalFieldTime = (p) =>
+    Number(p.breakdown.fwd || 0) +
+    Number(p.breakdown.mid || 0) +
+    Number(p.breakdown.def || 0);
+
+  const getSubTime = (p) => Number(p.breakdown.sub || 0);
+
+  const allPlayers = Object.values(assignments);
+
+  // Sort all players by total field time descending
+  allPlayers.sort((a, b) => getTotalFieldTime(b) - getTotalFieldTime(a));
+
+  // Split into subs and fieldPlayers, maintaining order
+  allPlayers.forEach((player) => {
+    const { assignedPosition } = player;
+
+    if (assignedPosition === 'sub') {
+      subs.push(player);
+    } else if (['def', 'mid', 'fwd'].includes(assignedPosition)) {
+      fieldPlayers[assignedPosition].push(player);
+    }
+  });
+
+  console.log('fieldPlayers check doo ' + JSON.stringify(fieldPlayers));
+  console.log('subs check doo ' + JSON.stringify(subs));
+
+
+  const sortedFieldPlayers = getFieldPlayersWithTotalTime(fieldPlayers);
+  console.log('sortedFieldPlayers ' + JSON.stringify(sortedFieldPlayers));
+
+  const sortedSubs = getSortedSubsBySubTime(subs);
+  console.log('sortedSubs ' + JSON.stringify(sortedSubs));
+
+  const suggestedPairs = matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers);
+  console.log('Suggested Sub Changes:', suggestedPairs);
+
+  return suggestedPairs
+
+}
+
+
 
 
   function getSeasonSuggestedSubChanges(assignments) {
@@ -1282,7 +1449,7 @@ function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed =
 
 
   const callSubsSort = () => {
-
+    //dispatch(updateAiTokens(1000));
     dispatch(updateAssignedIds([])); // ✅ Pass an empty array to clear it
     setExplanationMessages([])
     console.log('assignedIds cleared');
@@ -1359,6 +1526,8 @@ function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed =
         explanationMessages: liveExplanationMessages
       } = getSuggestedSubChanges(liveAssignments, assignedIds, true);
 
+      const liveSubSuggestionsNew = getSuggestedSubChangesNew(liveAssignments); // live logic
+
       console.log('Explanation Messages 2:', liveExplanationMessages);
       dispatch(updateAssignedIds(newAssignedIds));
       // Set messages and clear after 10 seconds
@@ -1368,19 +1537,21 @@ function getSuggestedSubChanges(assignments, assignedIds = [], checkTimePlayed =
         setExplanationMessages({});
       }, 10000); // 10000 ms = 10 seconds
 
-      const suggestions = showLiveToggle ? liveSubSuggestions : subSuggestions;
+      const suggestions = showLiveToggle ? liveSubSuggestionsNew : subSuggestions;
 
 
       console.log('liveSubSuggestions (live) ' + JSON.stringify(liveSubSuggestions));
       console.log('subSuggestions (season) ' + JSON.stringify(subSuggestions));
+      console.log('liveSubSuggestionsNew (live) ' + JSON.stringify(liveSubSuggestionsNew));
+
 
       // Check if the relevant suggestions exist
       const hasActiveSuggestions = showLiveToggle
-        ? liveSubSuggestions && liveSubSuggestions.length > 0
+        ? liveSubSuggestionsNew && liveSubSuggestionsNew.length > 0
         : subSuggestions && subSuggestions.length > 0;
 
       if (hasActiveSuggestions) {
-        dispatch(updateSubSuggestions(subSuggestions, liveSubSuggestions));
+        dispatch(updateSubSuggestions(subSuggestions, liveSubSuggestionsNew));
         dispatch(updateAiTokens(aiTokens - 1));
         setAiMessage(''); // Clear previous AI message
       } else {
