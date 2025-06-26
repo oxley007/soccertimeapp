@@ -1813,7 +1813,7 @@ function getSuggestedSubChangesNew(assignments) {
                     variant="subtle"
                     onPress={() => callSubsSort()}
                   >
-                    <Text style={{ fontSize: 20, color: '#fff' }}>
+                    <Text style={{ fontSize: 18, color: '#fff' }}>
                       {getButtonText()}
                     </Text>
                   </Button>

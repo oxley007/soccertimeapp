@@ -2231,7 +2231,7 @@ catch {
 
 
 		return (
-			<Box>
+			<Box style={{maxWidth: '100%', minWidth: '100%'}}>
 			{showAssignPlayerPositions && (
 				<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
 			)}
@@ -2256,8 +2256,7 @@ catch {
 
 
 		return (
-			<Box>
-				<Text syle={{color: '#fff'}}>hiya!</Text>
+			<Box style={{maxWidth: '100%', minWidth: '100%'}}>
 				{showAssignPlayerPositions && (
 					<AssignPlayerPositions playerData={undefined} navigation={props.navigation} playerIndex={playerIndexPos} fromLiveGame={fromLiveGame} />
 				)}
@@ -2653,6 +2652,7 @@ const styles = StyleSheet.create({
       },
       android: {
         width: '100%',
+				maxWidth: '100%',
       },
       default: {
         width: '100%',
