@@ -88,7 +88,7 @@ android {
         applicationId "com.soccertimeapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 59
+        versionCode 70
         versionName "2.4.10"
     }
     signingConfigs {

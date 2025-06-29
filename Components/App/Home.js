@@ -2596,7 +2596,6 @@ const Home = (props)=>{
   </Box>
   }
               <Text style={{color: 'transparent', fontSize: 0, lineHeight: 0}} >{getHalfTimeFlag}</Text>
-              <Button minW="100%" bg="#E879F9" size="md" pt="5" pb="5" _text={{fontSize: 26, color: '#fff'}} variant="subtle" onPress={() => handleUpdateId()}>Fix ID 12 Only</Button>
 
             </ScrollView>
           </Container>
@@ -2788,4 +2787,9 @@ delete test Users
 /*
 import * as Sentry from '@sentry/react-native';
 <Button title='Try!' onPress={ () => { Sentry.captureException(new Error('First error')) }}/>
+*/
+
+
+/*
+<Button minW="100%" bg="#E879F9" size="md" pt="5" pb="5" _text={{fontSize: 26, color: '#fff'}} variant="subtle" onPress={() => handleUpdateId()}>Fix ID 12 Only</Button>
 */
