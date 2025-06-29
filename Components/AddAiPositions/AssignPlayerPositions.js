@@ -199,6 +199,8 @@ const AssignPlayerPositions = (props)=>{
     console.log(assignedIds.join(',') + ' assignedIds check (updated)');
   }, [assignedIds]);
 
+
+
   /*
   const showAiSubsAlert = () => {
     let playerOnField = 0;
@@ -1250,6 +1252,7 @@ function getSortedSubsBySubTime(subs) {
   return sortedSubs;
 }
 
+/*
 function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
   const suggestions = [];
   const matchedFieldPlayerIds = new Set();
@@ -1279,10 +1282,7 @@ function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
 
       const fieldBreakdown = fieldPlayer.breakdown || {};
       const fieldPercent = fieldBreakdown[pos] || 0;
-      /*const fieldPlayerTimePlayed =
-        (fieldBreakdown.fwd || 0) +
-        (fieldBreakdown.mid || 0) +
-        (fieldBreakdown.def || 0);*/
+
 
       const fieldValidPositions = Object.entries(fieldPlayer.playerPositions || {})
         .filter(([_, value]) => value)
@@ -1321,6 +1321,98 @@ function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
 
   return suggestions;
 }
+*/
+
+function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
+  const suggestions = [];
+  const matchedFieldPlayerIds = new Set();
+
+  sortedSubs.forEach(sub => {
+    const subBreakdown = sub.breakdown || {};
+    const subPercent =
+      (subBreakdown.fwd || 0) +
+      (subBreakdown.mid || 0) +
+      (subBreakdown.def || 0);
+
+    const subValidPositions = Object.entries(sub.playerPositions || {})
+      .filter(([_, value]) => value)
+      .reduce((acc, [key]) => {
+        acc[key] = true;
+        return acc;
+      }, {});
+
+    const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+
+    let matched = false;
+
+    for (let i = 0; i < sortedFieldPlayers.length; i++) {
+      const fieldPlayer = sortedFieldPlayers[i];
+      const pos = fieldPlayer.assignedPosition;
+
+      const canPlayPosition = sub.playerPositions?.[pos];
+      if (!canPlayPosition || matchedFieldPlayerIds.has(fieldPlayer.playerId)) continue;
+
+      const fieldBreakdown = fieldPlayer.breakdown || {};
+      const fieldPercent = fieldBreakdown[pos] || 0;
+
+      const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+      // ❌ Prevent swap if sub has played MORE time than the on-field player
+      if (subTimePlayed > fieldPlayerTimePlayed) continue;
+
+      const fieldValidPositions = Object.entries(fieldPlayer.playerPositions || {})
+        .filter(([_, value]) => value)
+        .reduce((acc, [key]) => {
+          acc[key] = true;
+          return acc;
+        }, {});
+
+      suggestions.push({
+        subName: sub.playerName,
+        subId: sub.playerId,
+        subPercent,
+        breakdown: subBreakdown,
+        positionDetails: sub.positionDetails || {},
+        timePlayed: subTimePlayed,
+        validPositions: subValidPositions,
+
+        fieldPlayerName: fieldPlayer.playerName,
+        fieldPlayerId: fieldPlayer.playerId,
+        fieldPercent,
+        fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+        fieldPlayerTimePlayed,
+        fieldValidPositions,
+
+        position: pos,
+        improvement: fieldPercent - subPercent,
+        matched: true
+      });
+
+      matchedFieldPlayerIds.add(fieldPlayer.playerId);
+      matched = true;
+      break;
+    }
+
+    if (!matched) {
+      suggestions.push({
+        subName: sub.playerName,
+        subId: sub.playerId,
+        subPercent,
+        breakdown: subBreakdown,
+        positionDetails: sub.positionDetails || {},
+        timePlayed: subTimePlayed,
+        validPositions: subValidPositions,
+        noSubReason: 'No onfield players in their allocated positions have a lesser time',
+        matched: false,
+      });
+    }
+  });
+
+  console.log('suggestions check full ' + JSON.stringify(suggestions));
+
+  return suggestions;
+}
+
 
 
 function getSuggestedSubChangesNew(assignments) {

@@ -190,83 +190,152 @@ const SubSuggestions: React.FC<any> = (props) => {
       </View>
 
       <ScrollView>
-        {activeSuggestions.map((suggestion, index) => (
-          <View
-            key={index}
-            style={{
-              marginBottom: 24,
-              padding: 12,
-              borderWidth: 1,
-              borderRadius: 8,
-              borderColor: '#777',
-              backgroundColor: '#333'
-            }}
-          >
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}>
-              {suggestion.subName}
-              <Text style={{ fontSize: 16, color: '#fff', fontWeight: '300', }}>
-                {' '}(Game-Time: <Text style={{ fontSize: 16, color: '#ccc', fontWeight: 'bold' }}>{suggestion.timePlayed}min</Text>
-                )
-              </Text>
-            </Text>
-            <Text style={{ fontSize: 16, marginBottom: 4, color: '#eee' }}>
-              {swapIcon} Swap with: <Text style={{ fontWeight: 'bold', color: '#fff' }}>{suggestion.fieldPlayerName}</Text>
-              <Text style={{ fontSize: 14, color: '#ccc' }}>
-                {' '}(Game-Time: <Text style={{ fontSize: 14, color: '#ccc', fontWeight: 'bold' }}>{suggestion.fieldPlayerTimePlayed}min)</Text>
-              </Text>
-            </Text>
-            <Text style={{ fontSize: 16, marginBottom: 8, color: '#ccc' }}>
-              Sub Into Position: <Text style={{ fontSize: 16, marginBottom: 8, color: '#E879F9', fontWeight: '600' }}>{suggestion.position.toUpperCase()}</Text>
-            </Text>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              {Object.entries(suggestion.breakdown).map(([key, value]) => (
-                <View key={key} style={{ alignItems: 'center', minWidth: 40 }}>
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>{key.toUpperCase()}</Text>
-                  <Text style={{ color: '#aaa' }}>{value}%</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Action buttons */}
-            <View style={{ flexDirection: 'row', marginTop: 12, justifyContent: 'space-between' }}>
-
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                marginRight: 8,
-                padding: 10,
-                borderRadius: 6,
-                backgroundColor: activeSubId === null ? '#34d399' : '#a7f3d0',
-                opacity: activeSubId !== null ? 0.5 : 1,
-              }}
-              disabled={activeSubId !== null}
-              onPress={() => handleMakeSub(suggestion)}
-            >
-              <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
-                {activeSubId === suggestion.subId ? 'Loading...' : 'Make Sub'}
-              </Text>
-            </TouchableOpacity>
-
-
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  marginLeft: 8,
-                  padding: 10,
-                  borderRadius: 6,
-                  backgroundColor: '#ff3b30', // iOS red
-                }}
-                onPress={() => handleRemoveSuggestion(suggestion.subId)}
-              >
-                <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
-                  Remove Suggestion
+      {activeSuggestions.map((suggestion, index) => (
+        <View
+          key={index}
+          style={{
+            marginBottom: 24,
+            padding: 12,
+            borderWidth: 1,
+            borderRadius: 8,
+            borderColor: '#777',
+            backgroundColor: '#333',
+          }}
+        >
+          {suggestion.matched ? (
+            <>
+              <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}>
+                {suggestion.subName}
+                <Text style={{ fontSize: 16, color: '#fff', fontWeight: '300' }}>
+                  {' '}(Game-Time: <Text style={{ fontSize: 16, color: '#ccc', fontWeight: 'bold' }}>{suggestion.timePlayed}min</Text>)
                 </Text>
-              </TouchableOpacity>
+              </Text>
 
-            </View>
-          </View>
-        ))}
+              <Text style={{ fontSize: 16, marginBottom: 4, color: '#eee' }}>
+                {swapIcon} Swap with: <Text style={{ fontWeight: 'bold', color: '#fff' }}>{suggestion.fieldPlayerName}</Text>
+                <Text style={{ fontSize: 14, color: '#ccc' }}>
+                  {' '}(Game-Time: <Text style={{ fontSize: 14, color: '#ccc', fontWeight: 'bold' }}>{suggestion.fieldPlayerTimePlayed}min)</Text>
+                </Text>
+              </Text>
+
+              <Text style={{ fontSize: 16, marginBottom: 8, color: '#ccc' }}>
+                Sub Into Position:{' '}
+                <Text style={{ fontSize: 16, marginBottom: 8, color: '#E879F9', fontWeight: '600' }}>
+                  {suggestion.position.toUpperCase()}
+                </Text>
+              </Text>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                {Object.entries(suggestion.breakdown).map(([key, value]) => (
+                  <View key={key} style={{ alignItems: 'center', minWidth: 40 }}>
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>{key.toUpperCase()}</Text>
+                    <Text style={{ color: '#aaa' }}>{value}%</Text>
+                  </View>
+                ))}
+              </View>
+              {suggestion.validPositions && Object.keys(suggestion.validPositions).length > 0 && (
+                <View style={{ marginTop: 12 }}>
+                  <Text style={{ fontSize: 14, color: '#ccc' }}>
+                    Allocated Positions:{' '}
+                    <Text style={{ fontWeight: '600', color: '#EAB308' }}>
+                      {Object.entries(suggestion.validPositions)
+                        .filter(([_, isValid]) => isValid)
+                        .map(([position]) => position.toUpperCase())
+                        .join(', ')}
+                    </Text>
+                  </Text>
+                </View>
+              )}
+
+              {/* Action buttons */}
+              <View style={{ flexDirection: 'row', marginTop: 12, justifyContent: 'space-between' }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    marginRight: 8,
+                    padding: 10,
+                    borderRadius: 6,
+                    backgroundColor: activeSubId === null ? '#34d399' : '#a7f3d0',
+                    opacity: activeSubId !== null ? 0.5 : 1,
+                  }}
+                  disabled={activeSubId !== null}
+                  onPress={() => handleMakeSub(suggestion)}
+                >
+                  <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
+                    {activeSubId === suggestion.subId ? 'Loading...' : 'Make Sub'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    marginLeft: 8,
+                    padding: 10,
+                    borderRadius: 6,
+                    backgroundColor: '#ff3b30',
+                  }}
+                  onPress={() => handleRemoveSuggestion(suggestion.subId)}
+                >
+                  <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
+                    Remove Suggestion
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#fff' }}>
+                {suggestion.subName}
+                <Text style={{ fontSize: 16, color: '#fff', fontWeight: '300' }}>
+                  {' '}(Game-Time: <Text style={{ fontSize: 16, color: '#ccc', fontWeight: 'bold' }}>{suggestion.timePlayed}min</Text>)
+                </Text>
+              </Text>
+
+              <Text style={{ fontSize: 16, color: '#aaa', marginTop: 8 }}>
+                ⚠️ No substitution available — <Text style={{ color: '#f87171' }}>{suggestion.noSubReason}</Text>
+              </Text>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                {Object.entries(suggestion.breakdown).map(([key, value]) => (
+                  <View key={key} style={{ alignItems: 'center', minWidth: 40 }}>
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>{key.toUpperCase()}</Text>
+                    <Text style={{ color: '#aaa' }}>{value}%</Text>
+                  </View>
+                ))}
+              </View>
+              {suggestion.validPositions && Object.keys(suggestion.validPositions).length > 0 && (
+                <View style={{ marginTop: 12 }}>
+                  <Text style={{ fontSize: 14, color: '#ccc' }}>
+                    Allocated Positions:{' '}
+                    <Text style={{ fontWeight: '600', color: '#EAB308' }}>
+                      {Object.entries(suggestion.validPositions)
+                        .filter(([_, isValid]) => isValid)
+                        .map(([position]) => position.toUpperCase())
+                        .join(', ')}
+                    </Text>
+                  </Text>
+                </View>
+              )}
+
+
+              <View style={{ marginTop: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    borderRadius: 6,
+                    backgroundColor: '#ff3b30',
+                  }}
+                  onPress={() => handleRemoveSuggestion(suggestion.subId)}
+                >
+                  <Text style={{ textAlign: 'center', color: '#fff', fontWeight: '600' }}>
+                    Remove Suggestion
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+      ))}
       </ScrollView>
     </View>
   );
