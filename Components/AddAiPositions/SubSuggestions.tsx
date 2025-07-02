@@ -129,6 +129,53 @@ const SubSuggestions: React.FC<any> = (props) => {
         },
       };
 
+      // Get players
+      const subPlayer = teamPlayers[subIndex];     // Coming ON
+      const fieldPlayer = teamPlayers[fieldIndex]; // Going OFF
+
+      const position = subPlayer.currentPosition; // new position sub is going into
+
+      const positionLabels = {
+        fwd: 'is now playing as a Forward',
+        mid: 'is now playing Midfield',
+        def: 'is now playing as a Defender',
+        gol: 'is now playing as Goalkeeper',
+        sub: 'has been substituted off',
+      };
+
+      // Event time
+      const eventTime = games[0].secondsElapsed;
+
+      // Create event entries
+      const eventsToAdd = [];
+
+      // Event: player coming ON
+      if (position !== 'sub') {
+        const subOnText = `${subPlayer.playerName} ${positionLabels[position] || 'has entered the game'}`;
+        eventsToAdd.push({
+          eventType: 'sub',
+          eventText: subOnText,
+          eventTime,
+        });
+      }
+
+      // Event: player going OFF
+      const fieldOffText = `${fieldPlayer.playerName} ${positionLabels['sub']}`;
+      eventsToAdd.push({
+        eventType: 'sub',
+        eventText: fieldOffText,
+        eventTime,
+      });
+
+      // Push safely to game events
+      if (!Array.isArray(games[0].gameEvents)) {
+        games[0].gameEvents = [];
+      }
+
+      games[0].gameEvents.push(...eventsToAdd);
+
+      console.log('Substitution events logged:', eventsToAdd);
+
       const updatedEventsVersion = eventsVersion + 1;
 
       dispatch(updateGames(_games));

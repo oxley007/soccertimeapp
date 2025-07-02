@@ -48,7 +48,7 @@ import { updatePlayerIndex } from '../../Reducers/playerIndex';
 import { updateCheckSort } from '../../Reducers/checkSort';
 import { updatePosArray } from '../../Reducers/posArray';
 import { updateEventsVersion } from '../../Reducers/eventsVersion';
-
+import { updatePositionEventFlag } from '../../Reducers/positionEventFlag';
 
 interface BoardPosition {
 	row: number;
@@ -171,6 +171,7 @@ const SelectPlayersDragDrop = (props) => {
 	const userProfile = useSelector(state => state.userProfile.userProfile);
 	let eventsVersion = useSelector(state => state.eventsVersion.eventsVersion);
 	let fromContinueGame = useSelector(state => state.fromContinueGame.fromContinueGame);
+	let positionEventFlag = useSelector(state => state.positionEventFlag.positionEventFlag);
 
 	const whereFrom = props.whereFrom
 
@@ -1382,7 +1383,7 @@ const dipatchPosChange = async (player, playerPos) => {
 
 
 	      //try {
-	        if (playerPos === 'sub') {
+	        if (playerPos === 'sub' && positionEventFlag === true) {
 						console.log(games[0].secondsElapsed + ' _games[0].secondsElapsed');
 						console.log(secondsElapsed + ' secondsElapsed');
 						console.log('this is the key - why not hitting 1.5');
@@ -1400,7 +1401,7 @@ const dipatchPosChange = async (player, playerPos) => {
 
 						console.log('this is the key - why not hitting 1.7');
 	        }
-	        else {
+	        else if (positionEventFlag === true) {
 						console.log('this is the key - why not hitting 1.8');
 						addDescEvent = [{eventType: 'pos', eventText: subText, eventTime: games[0].secondsElapsed}]
 						//console.log(JSON.stringify(addDescEvent[0]) + ' above check addPoEvent[0] 2');
@@ -1507,6 +1508,7 @@ catch {
 					}}
 					onDragStart={() => {
 						//console.log('onDragStart hit!')
+						dispatch(updatePositionEventFlag(true))
 						//console.log(';just checking in a guess player.')
 
 						//const playerIndexRaw = games[0].teamPlayers.findIndex(x => x.id === player.indexId);

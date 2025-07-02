@@ -124,6 +124,7 @@ android {
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
+    implementation 'com.android.billingclient:billing:7.1.0'  // <-- Add this line
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-splash-screen')
     implementation 'org.jetbrains:annotations:16.0.2'

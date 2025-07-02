@@ -832,13 +832,30 @@ catch {
  //console.log(epochDate + ' checking epochDate here thanks');
  //console.log(productNameTitle + ' checking productNameTitle here thanks');
 
+     let navigateBackCheck = false
+     let navigateBackName = ''
+     let gameIdDb = ''
+     try {
+       navigateBackCheck = props.route.params.navigateBack
+       navigateBackName = props.route.params.navigateBackName
+       gameIdDb = props.route.params.gameIdDb
+     }
+     catch {
+       navigateBackCheck = false
+       navigateBackName = ''
+       gameIdDb = ''
+     }
+
     navigate('IapConfrim', {
       purchasedProduct: storeProduct,
       expiryDate: 1749784035000,
       productNameTitle: "test Sub pro_monthly_team",
       teamType: getTeamType,
       addTeamOnly: getAddTeamOnly,
-      gameIdDb: getGameIdDb
+      gameIdDb: getGameIdDb,
+      navigateBackCheck: navigateBackCheck,
+      navigateBackName: navigateBackName,
+      gameIdDb: gameIdDb
     });
   }
 
@@ -1779,6 +1796,12 @@ catch {
           <HStack>
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
+            Unlimited AI Sub Tokens
+            </Text>
+          </HStack>
+          <HStack>
+            <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+            <Text style={styles.textFourteen}>
             Access to all drills and advanced variations
             </Text>
           </HStack>
@@ -1851,6 +1874,12 @@ catch {
               </HStack>
             </Box>
           }
+          <HStack>
+            <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+            <Text style={styles.textFourteen}>
+              Unlimited AI Sub Tokens
+            </Text>
+          </HStack>
             <HStack>
               <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
               <Text style={styles.textFourteen}>
@@ -1910,7 +1939,19 @@ catch {
             <HStack>
               <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
               <Text style={styles.textFourteen}>
+                Unlimited AI Sub Tokens
+              </Text>
+            </HStack>
+            <HStack>
+              <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+              <Text style={styles.textFourteen}>
               Pay for entire team to view Pro Features
+              </Text>
+            </HStack>
+            <HStack>
+              <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+              <Text style={styles.textFourteen}>
+                Unlimited AI Sub Tokens
               </Text>
             </HStack>
             <HStack>
@@ -1969,6 +2010,12 @@ catch {
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
             All features from 'Pro Season Stats & Drills' included
+            </Text>
+          </HStack>
+          <HStack>
+            <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+            <Text style={styles.textFourteen}>
+              Unlimited AI Sub Tokens
             </Text>
           </HStack>
             <HStack>
@@ -2056,6 +2103,12 @@ catch {
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
               Forever subscription - pay once and have pro forever
+            </Text>
+          </HStack>
+          <HStack>
+            <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+            <Text style={styles.textFourteen}>
+              Unlimited AI Sub Tokens
             </Text>
           </HStack>
             <HStack>
@@ -2667,6 +2720,15 @@ console.log('hit cehcek 3');
                 <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#222', '#222']} style={{color: '#fff', fontSize: 24, lineHeight: 26, padding: 5, justifyContent: 'center', alignItems: 'center'}}>
                   <Text style={{color: '#ccc'}}>Continue to Support Our Parent-Led Initiative!</Text>
                 </LinearGradient>
+                {Platform.OS === 'ios' && (
+                  <Text style={{color: '#fff', paddingTop: 5}}>Note: Upgrading will replace your current subscription, so you’ll only ever be subscribed to one plan at a time.</Text>
+                )}
+                {Platform.OS !== 'ios' && (
+                  <Text style={{color: '#fff', paddingTop: 5}}>Note: Upgrading will keep your current subscription, so you’ll need to cancel your current plan to ensure your not paying twice. Cancelling is easy and done within your device - <Text style={{color: '#fff', textAlign: 'center', textDecorationLine: 'underline'}}
+                    onPress={() => Linking.openURL('https://support.google.com/googleplay/answer/7018481?hl=en&co=GENIE.Platform%3DAndroid')}>
+                    See here
+                  </Text>.</Text>
+                )}
               </Box>
       )
     }
@@ -2795,9 +2857,12 @@ console.log('hit cehcek 3');
 
     if (checkSortIap === 0) {
       return (
-        <Box minW="100%" safeAreaTop alignSelf="center" style={{paddingTop: 10, paddingBottom: 0, paddingLeft: 20, paddingRight: 20, height: '15%'}}>
+        <Box minW="100%" safeAreaTop alignSelf="center" style={{paddingTop: 10, paddingBottom: 0, paddingLeft: 20, paddingRight: 20, height: '20%'}}>
           <HStack style={{ justifyContent: 'center'}}>
             <Button style={{textDecorationLine: 'underline', backgroundColor: 'transparent', textAlign: 'center'}} onPress={() => getRestore()}><Text style={{color: '#E879F9'}}>Restore Purchases</Text></Button>
+          </HStack>
+          <HStack style={{ justifyContent: 'center'}}>
+            {cancelSub()}
           </HStack>
         </Box>
       )
@@ -2844,6 +2909,10 @@ console.log('hit cehcek 3');
               <HStack>
                 <Text style={{ paddingRight: 5, paddingTop: 2 }}>{checkIcon}</Text>
                 <Text style={styles.textFourteen}>Access player names on season stats</Text>
+              </HStack>
+              <HStack>
+                <Text style={{ paddingRight: 5, paddingTop: 2 }}>{checkIcon}</Text>
+                <Text style={styles.textFourteen}>Unlimited AI Sub Tokens</Text>
               </HStack>
               <HStack>
                 <Text style={{ paddingRight: 5, paddingTop: 2 }}>{checkIcon}</Text>
@@ -2915,6 +2984,12 @@ console.log('hit cehcek 3');
                 <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
                 <Text style={styles.textFourteen}>
                 All features from 'Pro Season Stats & Drills' included
+                </Text>
+              </HStack>
+              <HStack>
+                <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
+                <Text style={styles.textFourteen}>
+                  Unlimited AI Sub Tokens
                 </Text>
               </HStack>
               <HStack>
@@ -3240,7 +3315,6 @@ console.log('hit cehcek 3');
                     {getProductList === undefined || getProductList.length < 0 &&
                       <Text style={{color: '#fff'}}><ActivityIndicator size="large" color="#fff" animating={true} /> Loading...</Text>
                     }
-
                   </ScrollView>
                 </Container>
                   {displayFooter()}

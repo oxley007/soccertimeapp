@@ -18,12 +18,16 @@ import Purchases from 'react-native-purchases';
 
 import { updateGames } from '../../Reducers/games';
 
+const formattedSecondsShort = (sec) =>
+  Math.floor(sec / 60)
 
 const SelectSubTimeDesc = (props)=>{
 
   //const [getTeam, setGetTeam] = useState([]);
   //const [isOpen, setIsOpen] = useState(true);
   const [getProductList, setProductList] = useState([]);
+  const [getRemainderDisplay, setRemainderDisplay] = useState([]);
+
 
 
   let games = useSelector(state => state.games.games);
@@ -91,22 +95,45 @@ const SelectSubTimeDesc = (props)=>{
 
       return (
         <Box mb="5">
-        <Text style={styles.subTimes}>
-          {refreshSub} {nextSubMinute}min {playersRemainderDisplay}
-        </Text>
-
           <Text style={styles.subTimes}>
-            {refreshSub} {nextSubMinutePlusTwo}min {playersRemainderDisplay}
+            {refreshSub} {formattedSecondsShort(nextSubMinute)}min {playersRemainderDisplay}.
           </Text>
-
           <Text style={styles.subTimes}>
-            {refreshSub} {nextSubMinutePlusThree}min {playersRemainderDisplay}
+            {refreshSub} {formattedSecondsShort(nextSubMinutePlusTwo)}min {playersRemainderDisplay}
           </Text>
-
-          </Box>
+          <Text style={styles.subTimes}>
+            {refreshSub} {formattedSecondsShort(nextSubMinutePlusThree)}min {playersRemainderDisplay}
+          </Text>
+        </Box>
       )
 
     }
+
+    const getRecommendedSubData = () => {
+      if (!games?.[0]) return { times: [], remainderDisplay: '' };
+
+      const gameSeconds = games[0].sixtySecondsMark;
+      const gameFulltime = games[0].gameHalfTime * 2;
+      const subInterval = games[0].aiSubTime;
+
+      const times = [];
+      const nextIntervalStart = Math.floor(gameSeconds / subInterval) * subInterval;
+
+      for (let i = 0; i < 3; i++) {
+        const time = nextIntervalStart + i * subInterval;
+        if (time <= gameFulltime) {
+          times.push(`${Math.floor(time / 60)}min`);
+        }
+      }
+
+      const playersRemainder = games[0].playersRemainder;
+      let remainderDisplay = '';
+      if (playersRemainder > 0) {
+        remainderDisplay = 'x' + playersRemainder;
+      }
+
+      return { times, remainderDisplay };
+    };
 
 
         return (
@@ -126,26 +153,43 @@ const SelectSubTimeDesc = (props)=>{
                             </LinearGradient>
                           </Box>
                           <Box alignItems="center" mt="3" shadow="6">
-                          {getDataDisplay()}
-                          <Box style={{backgroundColor: '#333'}}>
+                          {games?.[0] ? (
+                            (() => {
+                              const { times, remainderDisplay } = getRecommendedSubData();
 
-                            <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
-                            These minutes show the suggested substitution times to help you reach the average playing time for each outfield player.
-                            </Text>
+                              return (
+                                <VStack>
+                                  {times.map((time, index) => (
+                                    <Center>
+                                      <Text style={styles.subTimes} key={index}>{refreshSub} {time} {remainderDisplay}</Text>
+                                    </Center>
+                                  ))}
+                                  <Box style={{backgroundColor: '#333', marginTop: 15}}>
 
-                            <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
-                            If you see a <Text style={{color: '#fff', fontSize: 18, fontWeight: 800}}>"{props.route.params.playersRemainderDisplay}"</Text> next to a time, it means we recommended {props.route.params.playersRemainderDisplay} substitutions at that time.
-                            </Text>
+                                    <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
+                                    These minutes show the suggested substitution times to help you reach the average playing time for each outfield player.
+                                    </Text>
 
-                            <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
-                            Think of these times as helpful targets—not strict rules—since every match brings its own surprises (like injuries, absences, early or late subs… or kids who just won’t come off!).
-                            </Text>
+                                    <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
+                                    If you see a <Text style={{color: '#fff', fontSize: 18, fontWeight: 800}}>"{remainderDisplay}"</Text> next to a time, it means we recommended {remainderDisplay} substitutions at that time.
+                                    </Text>
 
-                            <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
-                            You’ll find these suggestions at the top left of the main playing screen to help guide fair playtime for everyone.
-                            </Text> 
+                                    <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
+                                    Think of these times as helpful targets—not strict rules—since every match brings its own surprises (like injuries, absences, early or late subs… or kids who just won’t come off!).
+                                    </Text>
 
-                          </Box>
+                                    <Text style={{color: '#fff', fontSize: 18, padding: 15}}>
+                                    You’ll find these suggestions at the top left of the main playing screen to help guide fair playtime for everyone.
+                                    </Text>
+
+                                  </Box>
+                                </VStack>
+                              );
+                            })()
+                          ) : (
+                            <Text>Loading sub times...</Text>
+                          )}
+
                             </Box>
                             {getButtonDisplay()}
                         </View>

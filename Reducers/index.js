@@ -37,6 +37,8 @@ import subSuggestions from './subSuggestions'
 import aiTokens from './aiTokens'
 import showLiveToggle from './showLiveToggle'
 import assignedIds from './assignedIds'
+import positionEventFlag from './positionEventFlag'
+
 
 export default combineReducers({
   games,
@@ -75,4 +77,5 @@ export default combineReducers({
   aiTokens,
   showLiveToggle,
   assignedIds,
+  positionEventFlag,
 });

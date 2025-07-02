@@ -250,7 +250,7 @@ export default Sentry.wrap(function App() {
           <Drawer.Screen name="SupportPage" component={SupportPage} options={{ drawerLabel: 'Contact Support', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage /> }} />
           <Drawer.Screen name="SelectSubTimeDesc" component={SelectSubTimeDesc} options={{ drawerLabel: 'SelectSubTimeDesc', title: 'SoccerTime! Live.', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
           <Drawer.Screen name="AddAiTeamPlayersPositionHome" component={AddAiTeamPlayersPositionHome} options={{ drawerLabel: 'AddAiTeamPlayersPositionHome', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
-          <Drawer.Screen name="AppolloHooksTest" component={AppolloHooksTest} options={{ drawerLabel: 'AppolloHooksTest', headerTitle: (props) => <HeaderImage /> }} />
+          <Drawer.Screen name="AppolloHooksTest" component={AppolloHooksTest} options={{ drawerLabel: 'AppolloHooksTest', headerTitle: (props) => <HeaderImage />, drawerItemStyle: {display: "none"} }} />
         </Drawer.Navigator>
       </NavigationContainer>
     </ApolloProvider>

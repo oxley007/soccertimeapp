@@ -39,6 +39,7 @@ import { updateEventsVersion } from '../../Reducers/eventsVersion';
 import { updateSubSuggestions } from '../../Reducers/subSuggestions';
 import { updateAiTokens } from '../../Reducers/aiTokens';
 import { updateAssignedIds } from '../../Reducers/assignedIds';
+import { updatePositionEventFlag } from '../../Reducers/positionEventFlag';
 
 
 const AssignPlayerPositions = (props)=>{
@@ -86,6 +87,7 @@ const AssignPlayerPositions = (props)=>{
   let aiTokens = useSelector(state => state.aiTokens.aiTokens);
   let showLiveToggle = useSelector(state => state.showLiveToggle.showLiveToggle);
   let assignedIds = useSelector(state => state.assignedIds.assignedIds);
+  let positionEventFlag = useSelector(state => state.positionEventFlag.positionEventFlag);
 
 
   const dispatch = useDispatch()
@@ -662,6 +664,13 @@ const AssignPlayerPositions = (props)=>{
 
 
     playerLiveStats.forEach((player) => {
+
+      // ✅ Skip if player is marked absent
+      if (player.position === 'abs' || player.currentPosition === 'abs') {
+        console.log(`Skipping absent player: ${player.playerName}`);
+        return;
+      }
+
       const {
         fwdTotalTime = 0,
         midTotalTime = 0,
@@ -1542,6 +1551,7 @@ function getSuggestedSubChangesNew(assignments) {
 
   const callSubsSort = () => {
     //dispatch(updateAiTokens(1000));
+    dispatch(updatePositionEventFlag(false))
     dispatch(updateAssignedIds([])); // ✅ Pass an empty array to clear it
     setExplanationMessages([])
     console.log('assignedIds cleared');

@@ -246,11 +246,7 @@ const Stopwatch = (props)=>{
   }
 
   const showSubTimeDesc = (sixtySecondsMarkInSeconds, subEveryThisMinutes, playersRemainderDisplay) => {
-    navigate('SelectSubTimeDesc', {
-      sixtySecondsMarkInSeconds: sixtySecondsMarkInSeconds,
-      subEveryThisMinutes: subEveryThisMinutes,
-      playersRemainderDisplay: playersRemainderDisplay,
-    });
+    navigate('SelectSubTimeDesc');
   }
 
 
@@ -313,6 +309,7 @@ const Stopwatch = (props)=>{
         gameSeconds = 0
       }
 
+      console.log(gameSeconds + ' gameSeconds check');
       const sixtySecondsMarkInSeconds = gameSeconds / 60
       const subEveryThisMinutes = games[0].aiSubTime
 
@@ -334,8 +331,9 @@ const Stopwatch = (props)=>{
       console.log(gameSeconds + ' gameSeconds check is?');
       console.log(formattedSecondsShort(nextSubMinutePlusTwo) + ' nextSubMinutePlusTwo what is ya?');
       console.log(gameFulltimeSeconds + ' gameFulltimeSeconds what is ya?');
+      console.log(sixtySecondsMark + ' sixtySecondsMark what is ya?');
 
-      if (gametimeSecondsThreeBlocksAway > sixtySecondsMarkInSeconds) {
+      if (gametimeSecondsThreeBlocksAway > sixtySecondsMark) {
         return (
           <Button pl="" pt="0" m="0" pr="0" variant="unstyled" onPress={() => showSubTimeDesc(sixtySecondsMarkInSeconds, subEveryThisMinutes, playersRemainderDisplay)}>
             <Center>
@@ -382,6 +380,39 @@ const Stopwatch = (props)=>{
     }
 
 
+    const getRecommendedSubData = () => {
+      if (!games?.[0]) return { times: [], remainderDisplay: '' };
+
+      const gameSeconds = games[0].sixtySecondsMark;
+      const gameFulltime = games[0].gameHalfTime * 2;
+      const subInterval = games[0].aiSubTime;
+
+      const times = [];
+      const nextIntervalStart = Math.floor(gameSeconds / subInterval) * subInterval;
+
+      for (let i = 0; i < 3; i++) {
+        const time = nextIntervalStart + i * subInterval;
+        if (time <= gameFulltime) {
+          times.push(`${Math.floor(time / 60)}min`);
+        }
+      }
+
+      const playersRemainder = games[0].playersRemainder;
+      let remainderDisplay = '';
+      if (playersRemainder > 0) {
+        remainderDisplay = 'x' + playersRemainder;
+      }
+
+      return { times, remainderDisplay };
+    };
+
+
+
+
+    const subTimes = getRecommendedSubData();
+
+    console.log('Sub Times:', subTimes); // ← Add it here
+
 
         return (
           <Center style={props.secondsElapsed >= getFullTIme ? styles.paddingForScore : props.secondsElapsed === getHalfTimeNumber ? styles.paddingForScore : props.secondsElapsed === getHalfTimeNumberPlusOne ? styles.paddingForScore : props.secondsElapsed === getHalfTimeNumberMinusOne ? styles.paddingForScore : props.secondsElapsed === 0 ? styles.paddingForScore : styles.paddingForScoreZero} >
@@ -393,11 +424,23 @@ const Stopwatch = (props)=>{
                           {displayAvgTimePerPlayer()}
                 </Center>
               </VStack>
-              <VStack minW="15%" >
-                <Center>
-                          {displayAiSubTime()}
-                </Center>
-              </VStack>
+              <Button pl="" pt="0" m="0" pr="0" variant="unstyled" onPress={() => showSubTimeDesc()}>
+              {games?.[0] ? (
+                (() => {
+                  const { times, remainderDisplay } = getRecommendedSubData();
+
+                  return (
+                    <VStack>
+                      {times.map((time, index) => (
+                        <Text style={styles.subTimes} key={index}>{refreshSub} {time} {remainderDisplay}</Text>
+                      ))}
+                    </VStack>
+                  );
+                })()
+              ) : (
+                <Text>Loading sub times...</Text>
+              )}
+              </Button>
                 </HStack >
                 </Center>
               <VStack minW="45%" style={{marginTop: 10}}>
