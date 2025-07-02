@@ -623,13 +623,13 @@
 				DEVELOPMENT_TEAM = X99NP934TN;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = SoccerTimeApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = SoccerTimeLive;
+				INFOPLIST_KEY_CFBundleDisplayName = SoccerTime;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.10;
+				MARKETING_VERSION = 2.4.11;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -653,13 +653,13 @@
 				CURRENT_PROJECT_VERSION = 96;
 				DEVELOPMENT_TEAM = X99NP934TN;
 				INFOPLIST_FILE = SoccerTimeApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = SoccerTimeLive;
+				INFOPLIST_KEY_CFBundleDisplayName = SoccerTime;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.10;
+				MARKETING_VERSION = 2.4.11;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

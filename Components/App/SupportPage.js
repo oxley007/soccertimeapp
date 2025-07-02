@@ -80,7 +80,7 @@ const SupportPage = (props)=>{
                 </Center>
                 <Box style={{paddingTop: 40}}>
                 <Center>
-                <Text style={{ color: '#fff', fontSize: 12 }}>2.4.10</Text>
+                <Text style={{ color: '#fff', fontSize: 12 }}>2.4.11</Text>
                 <Button transparent light style={styles.textButtonBack}
                   onPress={() => navHome()}
                   >
