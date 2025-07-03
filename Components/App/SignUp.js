@@ -281,7 +281,7 @@ onGoogleButtonPress = async() => {
            loginType: 'Google',
            userProfile: 1,
            ramData: null,
-           version: '2.4.11',
+           version: '2.4.12',
          })
 
        firestore().collection(this.state.uid).doc("playerStats").set({
@@ -393,7 +393,7 @@ onGoogleButtonPress = async() => {
                loginType: 'Apple',
                userProfile: 1,
                ramData: null,
-               version: '2.4.11',
+               version: '2.4.12',
              })
 
            firestore().collection(this.state.uid).doc("playerStats").set({
@@ -481,7 +481,7 @@ onGoogleButtonPress = async() => {
             loginType: 'email',
             userProfile: 1,
             ramData: null,
-            version: '2.4.11',
+            version: '2.4.12',
           })
         })
         .then(data => {return firestore().collection(this.state.uid).doc("playerStats").set({
