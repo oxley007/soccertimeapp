@@ -1841,6 +1841,36 @@ function getSuggestedSubChangesNew(assignments) {
   };
 
 
+  const buyTokensDisplay = () => {
+
+    const purchases = [
+      pro_forever_indiv[0].purchased,
+      pro_yearly_indiv[0].purchased,
+      pro_yearly_team[0].purchased,
+      pro_forever_team[0].purchased,
+      pro_yearly_player[0].purchased,
+      pro_forever_player[0].purchased,
+    ];
+
+    const hasProSubscription = purchases.some(purchased => purchased === true);
+
+    if (!hasProSubscription) {
+      return (
+        <Button
+          bg="transparent"
+          size="sm"
+          m="0"
+          p="0"
+          variant="subtle"
+          onPress={() => goToIap()}
+          _text={{ color: '#E879F9', fontSize: 10, fontWeight: '600', textDecorationLine: 'underline', marginLeft: 1 }}
+        >
+          Buy Tokens
+        </Button>
+      )
+    }
+
+  }
 
 
         return (
@@ -1886,23 +1916,10 @@ function getSuggestedSubChangesNew(assignments) {
                   <Text style={{ color: '#fff', fontSize: 22, fontWeight: '600' }}>
                     AI Sub Suggestions:
                   </Text>
-                  <Text style={{ color: '#ccc', fontSize: 12, marginLeft: 8 }}>
-                    ({' '}AI Tokens: {aiToeknDisplay} -
+                  <Text style={{ color: '#ccc', fontSize: 10, marginLeft: 8 }}>
+                    AI Tokens: {aiToeknDisplay} -
                   </Text>
-                  <Button
-                    bg="transparent"
-                    size="sm"
-                    m="0"
-                    p="0"
-                    variant="subtle"
-                    onPress={() => goToIap()}
-                    _text={{ color: '#E879F9', fontSize: 12, fontWeight: '600', textDecorationLine: 'underline', marginLeft: 1 }}
-                  >
-                    Buy Tokens
-                  </Button>
-                  <Text style={{ color: '#ccc', fontSize: 12, marginLeft: 4 }}>
-                    )
-                  </Text>
+                  {buyTokensDisplay()}
                 </View>
 
                 <Button

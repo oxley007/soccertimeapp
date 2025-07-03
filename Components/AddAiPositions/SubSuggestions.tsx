@@ -304,6 +304,8 @@ const SubSuggestions: React.FC<any> = (props) => {
                     borderRadius: 6,
                     backgroundColor: activeSubId === null ? '#34d399' : '#a7f3d0',
                     opacity: activeSubId !== null ? 0.5 : 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                   disabled={activeSubId !== null}
                   onPress={() => handleMakeSub(suggestion)}
@@ -320,6 +322,8 @@ const SubSuggestions: React.FC<any> = (props) => {
                     padding: 10,
                     borderRadius: 6,
                     backgroundColor: '#ff3b30',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                   onPress={() => handleRemoveSuggestion(suggestion.subId)}
                 >
