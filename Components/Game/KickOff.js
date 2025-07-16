@@ -181,6 +181,8 @@ const KickOff = (props)=>{
 
     console.log('im hit to start timer');
     dispatch(updateGameBoardHideBtn(0))
+    eventsVersion = eventsVersion + 1
+    dispatch(updateEventsVersion(eventsVersion))
 
     if ( games[0].teamNames.awayTeamName === '' || games[0].teamNames.awayTeamShortName === '') {
       games[0].teamNames.awayTeamName = awayTeamNameStore

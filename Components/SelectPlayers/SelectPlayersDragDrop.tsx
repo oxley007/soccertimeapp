@@ -49,6 +49,7 @@ import { updateCheckSort } from '../../Reducers/checkSort';
 import { updatePosArray } from '../../Reducers/posArray';
 import { updateEventsVersion } from '../../Reducers/eventsVersion';
 import { updatePositionEventFlag } from '../../Reducers/positionEventFlag';
+import { updateSubSuggestions } from '../../Reducers/subSuggestions';
 
 interface BoardPosition {
 	row: number;
@@ -1477,7 +1478,7 @@ catch {
 
 }
 
-
+	//dispatch(updateSubSuggestions([], []));
 
 }
 
@@ -1507,7 +1508,7 @@ catch {
 						setKnightPosArray
 					}}
 					onDragStart={() => {
-						//console.log('onDragStart hit!')
+						console.log('onDragStart hit!')
 						dispatch(updatePositionEventFlag(true))
 						//console.log(';just checking in a guess player.')
 
@@ -1555,7 +1556,8 @@ catch {
 
 					}}
 					onDragExit={() => {
-						//console.log('onDragExit hit!')
+						console.log('onDragExit hit!')
+						dispatch(updateSubSuggestions([], []));
 
 						setTestLoading(0)
 
@@ -1574,7 +1576,7 @@ catch {
 						setTestLoading(1)
 						*/
 
-						//console.log('onDragDrop hit!')
+						console.log('onDragDrop hit!')
 						setExitDrag(true)
 						//dispatch(updatePlayerIndex(true))
 						setMoving(false);
@@ -1622,6 +1624,8 @@ catch {
 
 							console.log(player.row + ' player.row is?');
 							console.log(player.column + ' player.column is?');
+
+							//dispatch(updateSubSuggestions([], []));
 
 
 							setTimeout(function(){

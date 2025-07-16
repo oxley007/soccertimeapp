@@ -4,6 +4,7 @@ import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, R
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import analytics from '@react-native-firebase/analytics';
 import LinearGradient from 'react-native-linear-gradient';
 import DeviceInfo from 'react-native-device-info';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -53,6 +54,12 @@ const HomeSelectProfile = (props)=>{
   const teamRef = firestore().collection('teamTest1')
 
   const { navigate } = props.navigation;
+
+  useEffect(() => {
+    analytics().logEvent('home_screen_viewed', {
+      screen_class: 'HomeScreen',
+    });
+  }, []);
 
   try {
     useEffect(() => {

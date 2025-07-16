@@ -147,7 +147,7 @@ const AssignPlayerPositions = (props)=>{
     const { navigate } = props.navigation;
 
 
-    useEffect(() => {
+  useEffect(() => {
     const stats = teamPlayers.map((player) => calculatePlayerStats(player));
     setPlayerStats(stats);
 
@@ -165,7 +165,7 @@ const AssignPlayerPositions = (props)=>{
       setCombinedPlayerStats(stats);
       console.log('combinedPlayerStats... ' + JSON.stringify(combinedPlayerStats));
     }
-  }, [teamPlayers, games, sixtySecondsMark]);
+  }, [teamPlayers, games, sixtySecondsMark, statePlayerIndex, eventsVersion]);
 
 
   useEffect(() => {
@@ -1350,10 +1350,8 @@ function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
         return acc;
       }, {});
 
-    const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
 
-    let matched = false;
-
+    /*
     for (let i = 0; i < sortedFieldPlayers.length; i++) {
       const fieldPlayer = sortedFieldPlayers[i];
       const pos = fieldPlayer.assignedPosition;
@@ -1401,6 +1399,74 @@ function matchSubsToFieldPlayers(sortedSubs, sortedFieldPlayers) {
       matched = true;
       break;
     }
+    */
+
+    let matched = false;
+
+    const subTimePlayed = getLiveTimePlayedMinutes(sub.playerId);
+
+    // Step 1: Gather all valid matches where sub can replace the field player
+    const validMatches = sortedFieldPlayers.filter(fieldPlayer => {
+      const pos = fieldPlayer.assignedPosition;
+      const canPlayPosition = sub.playerPositions?.[pos];
+      const fieldPlayerTimePlayed = getLiveTimePlayedMinutes(fieldPlayer.playerId);
+
+      return (
+        canPlayPosition &&
+        !matchedFieldPlayerIds.has(fieldPlayer.playerId) &&
+        subTimePlayed < fieldPlayerTimePlayed
+      );
+    });
+
+    // Step 2: If we have valid matches, pick the most played ones
+    if (validMatches.length > 0) {
+      // Step 2a: Find max time played
+      const maxTimePlayed = Math.max(...validMatches.map(p => getLiveTimePlayedMinutes(p.playerId)));
+
+      // Step 2b: Filter only players with that time
+      const topCandidates = validMatches.filter(
+        p => getLiveTimePlayedMinutes(p.playerId) === maxTimePlayed
+      );
+
+      // Step 3: Pick one randomly from the top candidates
+      const fieldPlayer = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+      const pos = fieldPlayer.assignedPosition;
+
+      const fieldBreakdown = fieldPlayer.breakdown || {};
+      const fieldPercent = fieldBreakdown[pos] || 0;
+
+      const fieldValidPositions = Object.entries(fieldPlayer.playerPositions || {})
+        .filter(([_, value]) => value)
+        .reduce((acc, [key]) => {
+          acc[key] = true;
+          return acc;
+        }, {});
+
+      suggestions.push({
+        subName: sub.playerName,
+        subId: sub.playerId,
+        subPercent,
+        breakdown: subBreakdown,
+        positionDetails: sub.positionDetails || {},
+        timePlayed: subTimePlayed,
+        validPositions: subValidPositions,
+
+        fieldPlayerName: fieldPlayer.playerName,
+        fieldPlayerId: fieldPlayer.playerId,
+        fieldPercent,
+        fieldPlayerPositionDetails: fieldPlayer.positionDetails || {},
+        fieldPlayerTimePlayed: getLiveTimePlayedMinutes(fieldPlayer.playerId),
+        fieldValidPositions,
+
+        position: pos,
+        improvement: fieldPercent - subPercent,
+        matched: true
+      });
+
+      matchedFieldPlayerIds.add(fieldPlayer.playerId);
+      matched = true;
+    }
+
 
     if (!matched) {
       suggestions.push({
@@ -1567,7 +1633,23 @@ function getSuggestedSubChangesNew(assignments) {
 
     const hasProSubscription = purchases.some(purchased => purchased === true);
 
-    if (aiTokens < 1 && !hasProSubscription) {
+    if (sixtySecondsMark < 60) {
+      Alert.alert(
+        'Unable to get AI Subs',
+        "AI subs will be available after the first minute of play!",
+        [
+          {
+            text: 'Back',
+            onPress: () => {
+              // Do nothing or show manual sort UI
+            },
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
+    }
+    else if (aiTokens < 1 && !hasProSubscription) {
       Alert.alert(
         'Tokens all gone!',
         "If you want our AI to keep recommending player positions based on time spent in each role, please tap Buy Tokens and upgrade to a Pro subscription.",
@@ -1590,7 +1672,7 @@ function getSuggestedSubChangesNew(assignments) {
       );
     }
     else {
-      console.log('teamPlayers ' + JSON.stringify(teamPlayers));
+      console.log('teamPlayers here ya ' + JSON.stringify(teamPlayers));
       console.log('games[0].teamPlayers on button click ' + JSON.stringify(games[0].teamPlayers));
 
       //const seasonAssignments = assignPlayersByMatchFormat(); // original

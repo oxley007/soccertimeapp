@@ -4,6 +4,7 @@ import { NativeBaseProvider, Container, Header, Content, List, ListItem, Text, R
 import { useSelector, useDispatch } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import analytics from '@react-native-firebase/analytics';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 const plusIcon = <Icon name="plus" size={30} color="#fff" />;
@@ -83,6 +84,12 @@ const IapConfrim = (props)=>{
   }
 
   const { navigate } = props.navigation;
+
+  useEffect(() => {
+    analytics().logEvent('IapConfirm_screen_viewed', {
+      screen_name: 'IapConfirm',
+    });
+  }, []);
 
   useEffect(() => {
 
