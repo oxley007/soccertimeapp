@@ -173,6 +173,7 @@ const SelectPlayersDragDrop = (props) => {
 	let eventsVersion = useSelector(state => state.eventsVersion.eventsVersion);
 	let fromContinueGame = useSelector(state => state.fromContinueGame.fromContinueGame);
 	let positionEventFlag = useSelector(state => state.positionEventFlag.positionEventFlag);
+	let checkKo = useSelector(state => state.checkKo.checkKo);
 
 	const whereFrom = props.whereFrom
 
@@ -344,7 +345,7 @@ try {
 
 		getPosArrayStats()
 
-	},[sixtySecondsMark])
+	},[sixtySecondsMark, checkKo])
 }
 catch {
 	//do nothing.

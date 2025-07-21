@@ -77,7 +77,7 @@ const AddAiTeamPlayersPositionHome = (props)=>{
 
           <Box>
             <Heading mt="5" style={{color: '#fff'}}>Add Season Positions</Heading>
-            <Text style={{color: '#ccc', marginBottom: 2}}>Update the positions your players will play during the season so our AI understands their roles during the game. This allows for smarter suggestions on positions and substitutions.</Text>
+            <Text style={{color: '#ccc', marginBottom: 2}}>Update the positions your players will play during the season so our Smart-Subs understands their roles during the game. This allows for smarter suggestions on positions and substitutions.</Text>
             <Text style={{color: '#ccc', marginBottom: 2}}>If all team members play every position, you can leave the below selection as default.</Text>
           </Box>
           <View style={{ height: 2, backgroundColor: '#ccc', marginVertical: 12 }} />

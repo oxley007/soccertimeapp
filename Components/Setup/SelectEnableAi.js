@@ -73,7 +73,7 @@ const SelectEnableAi = (props)=>{
     <Box shadow="7">
     <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={['#111', '#111']} style={ props.isOpen === 0 ? styles.linearGradientIsOpenZero : props.whereFrom === 7 ? styles.linearGradientSeven : styles.linearGradient}>
     <Text style={{fontSize: 20, color: '#fff', fontWeight: '400', textAlign: 'left', paddingBottom: 3, paddingTop: 10}}>
-      Do you want to enable AI subs?
+      Do you want to enable Smart-Subs?
     </Text>
     <Text style={{fontSize: 16, color: '#ddd', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
       You can change this later under ‘Game Options’.
@@ -85,7 +85,7 @@ const SelectEnableAi = (props)=>{
         bg: "teal.600",
         endIcon: <CheckIcon size="5" />
       }} mt={1}  onValueChange={addEnableAiSelect.bind(this)} >
-          <Select.Item label="Yes – Show AI sub suggestions" value="1" />
+          <Select.Item label="Yes – Show Smart-Sub suggestions" value="1" />
           <Select.Item label="No – I'll manage subs myself" value="2" />
         </Select>
       </Box>

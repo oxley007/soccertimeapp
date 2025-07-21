@@ -105,7 +105,7 @@ const SetupHome = (props)=>{
         <Box style={{ backgroundColor: '#333' }}>
           {teamPlayersLength > matchFormat ? (
             <Text style={{ color: '#fff', fontSize: 18, padding: 15 }}>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>Heads up:</Text> Our AI will track playing time and will suggest subs every{' '}
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>Heads up:</Text> Our Smart-Subs will track playing time and will suggest subs every{' '}
               <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{formattedSeconds(result.minutesPerBlock)} minutes</Text>, so each outfield player (except the goalie) should get about{' '}
               <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{formattedSeconds(result.playerPlayTime)} minutes</Text> by the end of the game. It’s a helpful target—not an exact rule—since every match comes with unpredictable twists (like injuries, early or late subs… or even the occasional tantrum!). You can find this number at the top left of the main playing screen to help guide fair playing time for everyone. The most important rule is that everyone has fun!
             </Text>
@@ -500,7 +500,7 @@ const SetupHome = (props)=>{
       return (
         <Box style={{ backgroundColor: '#333' }}>
           <Text style={{ color: '#fff', fontSize: 18, padding: 15 }}>
-            <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>Heads up:</Text> Our AI will track playing time and will suggest subs every <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{result.minutesPerBlock}min</Text>, so each outfield player (except the goalie) should get about <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{result.playerPlayTime} minutes</Text> by the end of the game. It’s a helpful target—not an exact rule—since every match comes with unpredictable twists (like injuries, early or late subs… or even the occasional tantrum!). You can find this number at the top left of the main playing screen to help guide fair playing time for everyone. The most important rule is that everyone has fun!
+            <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>Heads up:</Text> Our Smart-Subs will track playing time and will suggest subs every <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{result.minutesPerBlock}min</Text>, so each outfield player (except the goalie) should get about <Text style={{ color: '#fff', fontSize: 18, fontWeight: 800 }}>{result.playerPlayTime} minutes</Text> by the end of the game. It’s a helpful target—not an exact rule—since every match comes with unpredictable twists (like injuries, early or late subs… or even the occasional tantrum!). You can find this number at the top left of the main playing screen to help guide fair playing time for everyone. The most important rule is that everyone has fun!
           </Text>
         </Box>
       )

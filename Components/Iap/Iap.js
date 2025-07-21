@@ -1796,7 +1796,7 @@ catch {
           <HStack>
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
-            Unlimited AI Sub Tokens
+            Unlimited Smart-Sub Tokens
             </Text>
           </HStack>
           <HStack>
@@ -1877,7 +1877,7 @@ catch {
           <HStack>
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
-              Unlimited AI Sub Tokens
+              Unlimited Smart-Sub Tokens
             </Text>
           </HStack>
             <HStack>
@@ -1939,7 +1939,7 @@ catch {
             <HStack>
               <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
               <Text style={styles.textFourteen}>
-                Unlimited AI Sub Tokens
+                Unlimited Smart-Sub Tokens
               </Text>
             </HStack>
             <HStack>
@@ -1951,7 +1951,7 @@ catch {
             <HStack>
               <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
               <Text style={styles.textFourteen}>
-                Unlimited AI Sub Tokens
+                Unlimited Smart-Sub Tokens
               </Text>
             </HStack>
             <HStack>
@@ -2015,7 +2015,7 @@ catch {
           <HStack>
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
-              Unlimited AI Sub Tokens
+              Unlimited Smart-Sub Tokens
             </Text>
           </HStack>
             <HStack>
@@ -2108,7 +2108,7 @@ catch {
           <HStack>
             <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
             <Text style={styles.textFourteen}>
-              Unlimited AI Sub Tokens
+              Unlimited Smart-Sub Tokens
             </Text>
           </HStack>
             <HStack>
@@ -2912,7 +2912,7 @@ console.log('hit cehcek 3');
               </HStack>
               <HStack>
                 <Text style={{ paddingRight: 5, paddingTop: 2 }}>{checkIcon}</Text>
-                <Text style={styles.textFourteen}>Unlimited AI Sub Tokens</Text>
+                <Text style={styles.textFourteen}>Unlimited Smart-Sub Tokens</Text>
               </HStack>
               <HStack>
                 <Text style={{ paddingRight: 5, paddingTop: 2 }}>{checkIcon}</Text>
@@ -2989,7 +2989,7 @@ console.log('hit cehcek 3');
               <HStack>
                 <Text style={{paddingRight: 5, paddingTop: 2}}>{checkIcon}</Text>
                 <Text style={styles.textFourteen}>
-                  Unlimited AI Sub Tokens
+                  Unlimited Smart-Sub Tokens
                 </Text>
               </HStack>
               <HStack>

@@ -38,6 +38,7 @@ import aiTokens from './aiTokens'
 import showLiveToggle from './showLiveToggle'
 import assignedIds from './assignedIds'
 import positionEventFlag from './positionEventFlag'
+import checkKo from './checkKo'
 
 
 export default combineReducers({
@@ -78,4 +79,5 @@ export default combineReducers({
   showLiveToggle,
   assignedIds,
   positionEventFlag,
+  checkKo,
 });

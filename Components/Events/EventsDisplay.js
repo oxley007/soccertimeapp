@@ -207,8 +207,8 @@ const EventsDisplay = (props)=>{
          //console.log(gameEvent.eventText + ' gameEvent.eventText here check 2');
             //let eventText = gameEvent.eventText;
             const eventTextArray = eventText.split("is");
-         //console.log(eventTextArray[0] + ' eventTextArray[0]');
-         //console.log(eventTextArray[1] + ' eventTextArray[1]');
+         console.log(eventTextArray[0] + ' eventTextArray[0]');
+         console.log(eventTextArray[1] + ' eventTextArray[1]');
             //const eventTextArrayTwo = eventTextArray.split(eventTextArray[0]);
           //console.log(eventTextArrayTwo[1] + ' eventTextArrayTwo does this say everything before the player name? 2');
             eventText = '...' + eventTextArray[1]

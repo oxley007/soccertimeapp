@@ -17,6 +17,7 @@ import { updateCheckSort } from '../../Reducers/checkSort';
 import { updateGameBoardHideBtn } from '../../Reducers/gameBoardHideBtn';
 import { updateExitGameFlagOptions } from '../../Reducers/exitGameFlagOptions';
 import { updateEventsVersion } from '../../Reducers/eventsVersion';
+import { updateCheckKo } from '../../Reducers/checkKo';
 //import { updateStatsBoard } from '../../Reducers/statsBoard';
 
 import Stopwatch from './Stopwatch'
@@ -68,6 +69,7 @@ const KickOff = (props)=>{
   let userProfile = useSelector(state => state.userProfile.userProfile);
   const parentCoachView = useSelector(state => state.parentCoachView.parentCoachView);
   let eventsVersion = useSelector(state => state.eventsVersion.eventsVersion);
+  let checkKo = useSelector(state => state.checkKo.checkKo);
 
   const dispatch = useDispatch()
 
@@ -183,6 +185,8 @@ const KickOff = (props)=>{
     dispatch(updateGameBoardHideBtn(0))
     eventsVersion = eventsVersion + 1
     dispatch(updateEventsVersion(eventsVersion))
+    checkKo = checkKo + 1
+    dispatch(updateCheckKo(checkKo))    
 
     if ( games[0].teamNames.awayTeamName === '' || games[0].teamNames.awayTeamShortName === '') {
       games[0].teamNames.awayTeamName = awayTeamNameStore

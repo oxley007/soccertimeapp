@@ -115,7 +115,7 @@ const SelectDedicatedGoalie = (props)=>{
       Will your goalie(s) sub to play outfield?
     </Text>
     <Text style={{fontSize: 16, color: '#ddd', fontWeight: '400', textAlign: 'left', paddingBottom: 3}}>
-      This info helps our AI know when to sub outfield players.
+      This info helps our Smart-Subs calculate when to sub outfield players.
     </Text>
     {getDedicatedGoalieId === 0 &&
       <Center>

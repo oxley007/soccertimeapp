@@ -1635,8 +1635,8 @@ function getSuggestedSubChangesNew(assignments) {
 
     if (sixtySecondsMark < 60) {
       Alert.alert(
-        'Unable to get AI Subs',
-        "AI subs will be available after the first minute of play!",
+        'Unable to get Smart-Subs',
+        "Smart-Subs will be available after the first minute of play!",
         [
           {
             text: 'Back',
@@ -1652,7 +1652,7 @@ function getSuggestedSubChangesNew(assignments) {
     else if (aiTokens < 1 && !hasProSubscription) {
       Alert.alert(
         'Tokens all gone!',
-        "If you want our AI to keep recommending player positions based on time spent in each role, please tap Buy Tokens and upgrade to a Pro subscription.",
+        "If you want our Smart-Subs to keep recommending player positions based on time spent in each role, please tap Buy Tokens and upgrade to a Pro subscription.",
         [
           {
             text: 'Buy Tokens',
@@ -1739,7 +1739,7 @@ function getSuggestedSubChangesNew(assignments) {
         dispatch(updateAiTokens(aiTokens - 1));
         setAiMessage(''); // Clear previous AI message
       } else {
-        setAiMessage('AI has no substitution suggestions right now — all players are currently well-balanced.');
+        setAiMessage('Smart-Subs has no substitution suggestions right now — all players are currently well-balanced.');
         setTimeout(() => {
           setAiMessage('');
         }, 10000); // 10 seconds
@@ -1763,7 +1763,7 @@ function getSuggestedSubChangesNew(assignments) {
   const callPlayerSort = () => {
 
     setLoading(true);
-    console.log('AI sorting triggered');
+    console.log('Smart-Subs sorting triggered');
 
     // Simulate 4 seconds of work
     setTimeout(() => {
@@ -1823,7 +1823,7 @@ function getSuggestedSubChangesNew(assignments) {
           <HStack >
           <Center pl="2">
             {swapIcon}
-            <Text style={styles.textBottomMenu}>Get AI Subs</Text>
+            <Text style={styles.textBottomMenu}>Get Smart-Subs</Text>
             </Center>
           </HStack>
         </Button>
@@ -1832,7 +1832,7 @@ function getSuggestedSubChangesNew(assignments) {
     }
     else if (props.fromAiAssign === true) {
       return (
-        <Button minW="59%" bg="#E879F9" size="md" _text={{fontSize: 16, color: '#fff'}} variant="subtle" onPress={() => callSubsSort()}>Get AI Subs</Button>
+        <Button minW="59%" bg="#E879F9" size="md" _text={{fontSize: 16, color: '#fff'}} variant="subtle" onPress={() => callSubsSort()}>Get Smart-Subs</Button>
       )
     }
     //<Button minW="59%" bg="#E879F9" size="md" _text={{fontSize: 16, color: '#fff'}} variant="subtle" onPress={() => callSubsSort()}>Get AI Subs</Button>
@@ -1850,13 +1850,13 @@ function getSuggestedSubChangesNew(assignments) {
     ) {
       return (
         <>
-          {swapIconWhite} Get AI Sub Suggestions
+          {swapIconWhite} Get Smart-Sub Suggestions
         </>
       );
     } else {
       return (
         <>
-          {swapIconWhite} Update AI Sub Suggestions
+          {swapIconWhite} Update Smart-Sub Suggestions
         </>
       );
     }
@@ -1966,27 +1966,27 @@ function getSuggestedSubChangesNew(assignments) {
                       minW="100%"
                       bg="#E879F9"
                       size="md"
-                      _text={{ fontSize: 22, color: '#fff' }}
+                      _text={{ fontSize: 20, color: '#fff' }}
                       variant="subtle"
                       onPress={callPlayerSort}
                       borderRadius={6}
                       isDisabled={loading}
                       leftIcon={loading ? <Spinner color="white" size="sm" /> : null}
                     >
-                      {loading ? 'Sorting...' : 'Auto Sort Positions with AI'}
+                      {loading ? 'Sorting...' : 'Auto Sort Positions with Smart-Subs'}
                     </Button>
                     </Animated.View>
                   </HStack>
                   {isPulsing === true &&
                     <View>
                       <Text style={{ color: '#fff', paddingBottom: 5 }}>
-                        Let our AI suggest player positions based on selections from the Season Positions page and time spent in each position.
+                        Let our Smart-Subs suggest player positions based on selections from the Season Positions page and time spent in each position.
                       </Text>
                       <Text style={{ color: '#fff', paddingBottom: 5 }}>
                         You can still sort manually using drag and drop to make adjustments.
                       </Text>
                       <Text style={{ color: '#fff' }}>
-                        AI suggestions aim to promote fairness and ensure all players get balanced time in their chosen positions.
+                        Smart-Subs suggestions aim to promote fairness and ensure all players get balanced time in their chosen positions.
                       </Text>
                     </View>
                   }
@@ -1995,11 +1995,11 @@ function getSuggestedSubChangesNew(assignments) {
             {(fromContinueGame === 1 && props.fromMenu !== true) &&
               <View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#333', marginBottom: 10 }}>
-                  <Text style={{ color: '#fff', fontSize: 22, fontWeight: '600' }}>
-                    AI Sub Suggestions:
+                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+                    Smart-Sub Suggestions:
                   </Text>
                   <Text style={{ color: '#ccc', fontSize: 10, marginLeft: 8 }}>
-                    AI Tokens: {aiToeknDisplay} -
+                    Sub Tokens: {aiToeknDisplay} -
                   </Text>
                   {buyTokensDisplay()}
                 </View>

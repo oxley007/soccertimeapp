@@ -230,7 +230,7 @@ const HomeSelectProfile = (props)=>{
         ramData: getRamData,
       })
       .catch(error => this.setState({ errorMessage: error.message }))
-    Alert.alert("Sorry, your phone isn’t powerful enough to run the coaching AI tools. These features require a device with at least 6GB of RAM." )
+    Alert.alert("Sorry, your phone isn’t powerful enough to run the coaching Smart-Sub tools. These features require a device with at least 6GB of RAM." )
   }
   else {
 

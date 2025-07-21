@@ -135,6 +135,8 @@ const SubSuggestions: React.FC<any> = (props) => {
 
       const position = subPlayer.currentPosition; // new position sub is going into
 
+      console.log('position hceck hm', position);
+
       const positionLabels = {
         fwd: 'is now playing as a Forward',
         mid: 'is now playing Midfield',
@@ -151,9 +153,11 @@ const SubSuggestions: React.FC<any> = (props) => {
 
       // Event: player coming ON
       if (position !== 'sub') {
+        console.log('positionLabels[position]', positionLabels[position]);
+
         const subOnText = `${subPlayer.playerName} ${positionLabels[position] || 'has entered the game'}`;
         eventsToAdd.push({
-          eventType: 'sub',
+          eventType: 'pos',
           eventText: subOnText,
           eventTime,
         });
@@ -230,7 +234,7 @@ const SubSuggestions: React.FC<any> = (props) => {
       <View style={{ flexDirection: 'row', marginBottom: 16 }}>
         <Button bg="transparent" p="0" size="md" variant="subtle" onPress={() => clearAiSubs()}>
           <Text style={{ marginRight: 8, color: '#E879F9', textDecorationLine: 'underline', fontSize: 18 }}>
-            Clear AI Sub Suggestions
+            Clear Smart-Sub Suggestions
           </Text>
         </Button>
 
