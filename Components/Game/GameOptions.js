@@ -435,41 +435,59 @@ const GameOptions = (props)=>{
       _games = [{...games}]
     }
 
-    let awayTeamScore = _games[0].score.awayTeam
-    awayTeamScore = awayTeamScore + 1
-    _games[0].score.awayTeam = awayTeamScore
-    const homeTeamScore = _games[0].score.homeTeam
-    const homeTeamName = _games[0].teamNames.homeTeamName
-    const awayTeamName = _games[0].teamNames.awayTeamName
-    const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
-    //try {
-      //////console.log('oppGoal add event hit here 1');
-      _games[0].gameEvents.push({eventType: 'goal', eventText: 'Opposition Goal', eventTime: secondsElapsed})
-      _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
-    /*
+    if (_games[0].halfTime === 0) {
+      Alert.alert(
+        'Unable to add a goal',
+        "You must kick-off a game before you can add a goal.",
+        [
+          {
+            text: 'Back',
+            onPress: () => {
+              // Do nothing or show manual sort UI
+            },
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
     }
-    catch {
-      //////console.log('oppGoal add event hit here 2');
-      _games[0].gameEvents = []
-      _games[0].gameEvents.push({eventType: 'goal', eventText: 'Opposition Goal', eventTime: secondsElapsed})
-      _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
-    }
-    */
+    else {
 
-    const eventBoardText = 'Opposition Goal Added'
+      let awayTeamScore = _games[0].score.awayTeam
+      awayTeamScore = awayTeamScore + 1
+      _games[0].score.awayTeam = awayTeamScore
+      const homeTeamScore = _games[0].score.homeTeam
+      const homeTeamName = _games[0].teamNames.homeTeamName
+      const awayTeamName = _games[0].teamNames.awayTeamName
+      const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
+      //try {
+        //////console.log('oppGoal add event hit here 1');
+        _games[0].gameEvents.push({eventType: 'goal', eventText: 'Opposition Goal', eventTime: secondsElapsed})
+        _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
+      /*
+      }
+      catch {
+        //////console.log('oppGoal add event hit here 2');
+        _games[0].gameEvents = []
+        _games[0].gameEvents.push({eventType: 'goal', eventText: 'Opposition Goal', eventTime: secondsElapsed})
+        _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
+      }
+      */
 
-    dispatch(updateGames(_games))
-    dispatch(updateStatsBoard(false, 99999999))
-    dispatch(updateGameOptionBoard(false, 99999999))
-    dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
+      const eventBoardText = 'Opposition Goal Added'
 
-    const teamIdCodeGames = _games[0].teamIdCode
-    const gameIdDb = _games[0].gameIdDb
+      dispatch(updateGames(_games))
+      dispatch(updateStatsBoard(false, 99999999))
+      dispatch(updateGameOptionBoard(false, 99999999))
+      dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
 
-    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
-       game: _games[0],
-     })
+      const teamIdCodeGames = _games[0].teamIdCode
+      const gameIdDb = _games[0].gameIdDb
 
+      firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+         game: _games[0],
+       })
+     }
   }
 
   const addGoal = () => {
@@ -537,46 +555,63 @@ const GameOptions = (props)=>{
       _games = [{...games}]
     }
 
-    let awayTeamScore = _games[0].score.awayTeam
-    if (awayTeamScore > 0) {
-      awayTeamScore = awayTeamScore - 1
+    if (_games[0].halfTime === 0) {
+      Alert.alert(
+        'Unable to remove a goal',
+        "You must kick-off a game before you can remove a goal.",
+        [
+          {
+            text: 'Back',
+            onPress: () => {
+              // Do nothing or show manual sort UI
+            },
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
     }
-    _games[0].score.awayTeam = awayTeamScore
-    const homeTeamScore = _games[0].score.homeTeam
-    const homeTeamName = _games[0].teamNames.homeTeamName
-    const awayTeamName = _games[0].teamNames.awayTeamName
-    //const eventScoreText = 'Goal removed: ' + homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
-    const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
-    //try {
-      //////console.log('oppGoal add event hit here 1');
+    else {
+      let awayTeamScore = _games[0].score.awayTeam
+      if (awayTeamScore > 0) {
+        awayTeamScore = awayTeamScore - 1
+      }
+      _games[0].score.awayTeam = awayTeamScore
+      const homeTeamScore = _games[0].score.homeTeam
+      const homeTeamName = _games[0].teamNames.homeTeamName
+      const awayTeamName = _games[0].teamNames.awayTeamName
+      //const eventScoreText = 'Goal removed: ' + homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
+      const eventScoreText = homeTeamName + ' ' + homeTeamScore +' vs ' + awayTeamScore + ' ' + awayTeamName
+      //try {
+        //////console.log('oppGoal add event hit here 1');
 
-      _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: 'Goal removed', eventTime: secondsElapsed})
-      //_games[0].gameEvents.push({eventType: 'score', eventText: 'Goal removed', eventTime: secondsElapsed})
-      _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
-      //_games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
-    /*
-    }
-    catch {
-      //////console.log('oppGoal add event hit here 2');
-      _games[0].gameEvents = []
-      _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
-    }
-    */
+        _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: 'Goal removed', eventTime: secondsElapsed})
+        //_games[0].gameEvents.push({eventType: 'score', eventText: 'Goal removed', eventTime: secondsElapsed})
+        _games[0].gameEvents.push({eventType: 'score', eventText: eventScoreText, eventTime: secondsElapsed})
+        //_games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
+      /*
+      }
+      catch {
+        //////console.log('oppGoal add event hit here 2');
+        _games[0].gameEvents = []
+        _games[0].gameEvents.push({eventType: 'scoreUndo', eventText: eventScoreText, eventTime: secondsElapsed})
+      }
+      */
 
-    const eventBoardText = 'Opposition Goal Removed'
+      const eventBoardText = 'Opposition Goal Removed'
 
-    dispatch(updateGames(_games))
-    dispatch(updateStatsBoard(false, 99999999))
-    dispatch(updateGameOptionBoard(false, 99999999))
-    dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
+      dispatch(updateGames(_games))
+      dispatch(updateStatsBoard(false, 99999999))
+      dispatch(updateGameOptionBoard(false, 99999999))
+      dispatch(updateEventDisplayBoard(true, statsBoardPlayerId, eventBoardText))
 
-    const teamIdCodeGames = _games[0].teamIdCode
-    const gameIdDb = _games[0].gameIdDb
+      const teamIdCodeGames = _games[0].teamIdCode
+      const gameIdDb = _games[0].gameIdDb
 
-    firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
-       game: _games[0],
-     })
-
+      firestore().collection(teamIdCodeGames).doc(gameIdDb).update({
+         game: _games[0],
+       })
+     }
   }
 
         return (
